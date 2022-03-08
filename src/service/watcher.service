@@ -1,0 +1,10 @@
+[Unit]
+Description=Get the perspective of Watcher
+
+[Service]
+ExecStart=/bin/python /usr/share/Watcher/log_files.py
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

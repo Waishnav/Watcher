@@ -1,0 +1,27 @@
+#!/usr/bin/python
+
+## watcher --start == will starts the process of making csv
+# watcher --daily == will give you your day overview till that point
+# watcher --week == will gives user their week overview of screen time
+
+import os
+import sys
+sys.path.insert(0, "/usr/share/Watcher/")
+
+import log_files as x
+#import report_creation
+
+#
+arg = sys.argv[1]
+if arg == "-ds":
+    a = os.popen('''python3 /usr/share/Watcher/report_creation.py''').read()
+    print(a)
+
+#elif arg == "daily":
+#    print("daily summary")
+#def main() -> None:
+    ...
+
+#if __name__ == "__main__":
+#    main()
+
