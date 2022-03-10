@@ -27,14 +27,14 @@ def time_addition(a,b):
     hr = int(b[0:2]) + int(a[0:2])
     mn = int(b[3:5]) + int(a[3:5])
     sec = int(b[6:8]) + int(a[6:8])
-    if mn > 60 and sec > 60:
+    if mn >= 60 and sec >= 60:
         hr = hr + 1
         mn = mn - 60 + 1
         sec = sec - 60
-    elif mn > 60:
+    elif mn >= 60:
         hr = hr + 1
         mn = mn - 60
-    elif sec > 60:
+    elif sec >= 60:
         mn = mn + 1
         sec = sec - 60
 
