@@ -1,5 +1,5 @@
 [Unit]
-Description=Get the perspective of Watcher
+Description=Get the perspective of Watcher of your Screen-Time
 
 [Service]
 ExecStart=/bin/python /usr/share/Watcher/log_files.py

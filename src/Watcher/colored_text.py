@@ -1,7 +1,7 @@
 class Color:
 
     def GREY(text):
-        return '\033[30m' + text + '\033[0m'
+        return '\033[90m' + text + '\033[0m'
 
     def BLUE(text):
         return '\033[34m' + text + '\033[0m'

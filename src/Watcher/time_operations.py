@@ -53,3 +53,8 @@ def convert_time(t):
     else:
         result =  t[0:2] + 'h ' + t[3:5] + 'm ' + t[6::] + 's'
     return result
+
+def convert_into_sec(t):
+    sec = int(t[0:2])*3600 + int(t[3:5])*60 + int(t[6::])
+    return sec
+

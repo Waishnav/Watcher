@@ -27,7 +27,6 @@ def append_line_in_csv(date, closed_time, window_name):
         csvwriter = csv.writer(csvfile, delimiter='\t')
         csvwriter.writerow(Data)
 
-
 # Expected Behaviour == if date got changed then append line in new csv file after initializing the csv file
 # also if usr is AFK then append line
 
@@ -51,4 +50,10 @@ def log_creation():
 
 
 if __name__ == "__main__":
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+    if not(os.path.isfile(filename)):
+        with open(filename, 'a') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter='\t')
+            csvwriter.writerow([get_time(), "00:00:00", ""])
+
     log_creation()
