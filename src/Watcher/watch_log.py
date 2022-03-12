@@ -35,7 +35,7 @@ def append_line_in_csv(date, closed_time, window_name):
 afk = False
 def log_creation():
     global afk
-    append_line_in_csv(get_date(), get_time(), "User-loged-in")
+    append_line_in_csv(get_date(), get_time(), "User-logged-in")
     while True:
         previous_window = x.active_window()
         if x.is_window_changed(previous_window) and not(afk):

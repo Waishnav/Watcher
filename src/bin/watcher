@@ -10,23 +10,24 @@ sys.path.insert(0, "/usr/share/Watcher/")
 import argparse
 import watch_log as x
 from colored_text import Color
-import report_creation as rc
+import commands as cmd
 
 def help_option():
     print(Color.BLUE("Watcher") + " - Minimal open source screen-time tracker\n")
     print(Color.YELLOW("USAGE:")+"\n\t watcher [OPTION]\n")
     print(Color.YELLOW("OPTIONS"))
-    print("\t-ds, --daily-summary     Displays where you have spend your time of that day")
+    print("\t-ds, --day-summary       Displays where you have spend your time of that day")
     print("\t-ws, --week-summary      Displays screen-time of each day of week")
-    print("\nFor more information see github repo: https://github.com/Waishnav/Watcher")
+    print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
 
 
 #print("▒▒▒\t▒▒▒\n███")
 arg = sys.argv[1]
-if arg == "-ds" or arg == "--daily-summary":
-    rc.daily_summary()
+if arg == "-ds" or arg == "--day-summary":
+    cmd.daily_summary()
 elif arg == "-ws" or arg == "--week-summary":
-    rc.week_summary()
+    os.popen("python3 /usr/share/Watcher/week_analysis.py")
+    cmd.week_summary()
 elif arg == "-h" or arg == "--help":
     help_option()
 elif arg == "--start":
@@ -36,17 +37,11 @@ elif arg == "--version":
 else:
     print(Color.RED("Wrong")+" [OPTION] choosen. Have a look at the Options!!\n")
     print(Color.YELLOW("OPTIONS"))
-    print("\t-ds, --daily-summary     Displays where you have spend your time of that day")
+    print("\t-ds, --day-summary     Displays where you have spend your time of that day")
     print("\t-ws, --week-summary      Displays screen-time of each day of week")
+    print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
 
 #parser = argparse.ArgumentParser(description="Minimal open source screen-time calulator for digitally wellbeing")
 #parser.add_argument()
 #args = parser.parse_args()
 #print(args)
-
-#def main(args=None):
-#    if arg is None:
-#        print("")
-#    else:
-#    print('''▒▒▒   ███   ▒▒▒   ▒▒▒   ▒▒▒   ▒▒▒   ▒▒▒\n▒▒▒   ███   ▒▒▒   ███   ▒▒▒   ███   ███\n███   ███   ███   ███   ▒▒▒   ███   ███\n███   ███   ███   ███   ███   ███   ███\n███   ███   ███   ███   ███   ███   ███\n███   ███   ███   ███   ███   ███   ███\n███   ███   ███   ███   ███   ███   ███''')
-

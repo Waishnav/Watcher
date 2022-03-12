@@ -16,7 +16,7 @@ class Color:
         return '\033[31m' + text + '\033[0m'
 
     def PURPLE(text):
-        return '\033[95m' + text + '\033[0m'
+        return '\033[35m' + text + '\033[0m'
 
     def DARKCYAN(text):
         return '\033[36m' + text + '\033[0m'

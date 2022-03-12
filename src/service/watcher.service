@@ -1,8 +1,8 @@
 [Unit]
-Description=Get the perspective of Watcher of your Screen-Time
+Description=Get the perspective from Watcher about your Screen-Time
 
 [Service]
-ExecStart=/bin/python /usr/share/Watcher/log_files.py
+ExecStart=/bin/python /usr/share/Watcher/watch_log.py
 Type=simple
 Restart=on-failure
 

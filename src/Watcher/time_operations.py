@@ -9,12 +9,17 @@ def time_difference(a,b): # b - a
         sec = 60 + sec
         if hr < 0:
             hr = hr + 24
-    elif int(mn) < 0 and int(sec) > 0:
+    elif int(mn) < 0 and int(sec) >= 0:
         hr = hr - 1
         mn = 60 + mn
     elif int(sec) < 0 and int(mn) > 0:
         sec = 60 + sec
         mn = mn - 1
+    elif int(sec) < 0 and int(mn) == 0:
+        hr = hr - 1
+        mn = 59
+        sec = 60 + sec
+     #elif int(mn) < 0:
 
     hr = str(hr).zfill(2)
     mn = str(mn).zfill(2)
@@ -45,13 +50,14 @@ def time_addition(a,b):
 
     return result
 
-def convert_time(t):
-    if int(t[0:2]) == 0:
-        result = t[3:5] + 'm ' + t[6::] + 's'
-        if int(t[3:5]) == 0:
-            result = t[6::] + 's'
-    else:
-        result =  t[0:2] + 'h ' + t[3:5] + 'm ' + t[6::] + 's'
+def format_time(t):
+    result =  t[0:2] + 'h ' + t[3:5] + 'm ' + t[6::] + 's'
+    #if int(t[0:2]) == 0:
+    #    result = t[3:5] + 'm ' + t[6::] + 's'
+    #    if int(t[3:5]) == 0:
+    #        result = t[6::] + 's'
+    #else:
+    #    result =  t[0:2] + 'h ' + t[3:5] + 'm ' + t[6::] + 's'
     return result
 
 def convert_into_sec(t):
