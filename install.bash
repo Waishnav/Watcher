@@ -1,5 +1,5 @@
 sudo cp -r ./src/Watcher /usr/share/
-cp -r ./src/bin/watcher ~/.local/share/bin/
+cp -r ./src/bin/watcher ~/.local/bin/
 sudo chmod +x ~/.local/bin/watcher
 cp -r ./src/service/watcher.service ~/.config/systemd/user/
 systemctl --user enable watcher.service
