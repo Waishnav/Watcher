@@ -1,8 +1,4 @@
-#!/usr/bin/python3
-
-## watcher --start == will starts the process of making csv
-# watcher --daily-summary == will give you your day overview till that point
-# watcher --week-summary == will gives user their week overview of screen time
+#!/usr/bin/python
 
 import os
 import sys
@@ -18,28 +14,34 @@ def help_option():
     print(Color.YELLOW("OPTIONS"))
     print("\t-ds, --day-summary       Displays where you have spend your time of that day")
     print("\t-ws, --week-summary      Displays screen-time of each day of week")
+    print("\t-s, --start              It starts taking logs afterwards in following directory ~/.cache/Watcher/raw_data/")
     print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
 
 
 #print("▒▒▒\t▒▒▒\n███")
-arg = sys.argv[1]
-if arg == "-ds" or arg == "--day-summary":
-    cmd.daily_summary()
-elif arg == "-ws" or arg == "--week-summary":
-    os.popen("python3 /usr/share/Watcher/week_analysis.py")
-    cmd.week_summary()
-elif arg == "-h" or arg == "--help":
+try:
+    arg = sys.argv[1]
+    if arg == "-ds" or arg == "--day-summary":
+        cmd.daily_summary()
+    elif arg == "-ws" or arg == "--week-summary":
+        os.popen("python3 /usr/share/Watcher/week_analysis.py")
+        cmd.week_summary()
+    elif arg == "-h" or arg == "--help":
+        help_option()
+    elif arg == "--start":
+        print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C)")
+        x.log_creation()
+    elif arg == "--version":
+        print("Version: 1.0")
+    else:
+        print(Color.RED("Wrong")+" [OPTION] choosen. Have a look at the Options!!\n")
+        print(Color.YELLOW("OPTIONS"))
+        print("\t-ds, --day-summary     Displays where you have spend your time of that day")
+        print("\t-ws, --week-summary      Displays screen-time of each day of week")
+        print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
+
+except IndexError:
     help_option()
-elif arg == "--start":
-    x.log_creation()
-elif arg == "--version":
-    print("Version: 1.0")
-else:
-    print(Color.RED("Wrong")+" [OPTION] choosen. Have a look at the Options!!\n")
-    print(Color.YELLOW("OPTIONS"))
-    print("\t-ds, --day-summary     Displays where you have spend your time of that day")
-    print("\t-ws, --week-summary      Displays screen-time of each day of week")
-    print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
 
 #parser = argparse.ArgumentParser(description="Minimal open source screen-time calulator for digitally wellbeing")
 #parser.add_argument()

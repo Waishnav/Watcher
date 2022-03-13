@@ -10,7 +10,7 @@ def get_dates():
     # The start of the week
     start = theday - datetime.timedelta(days=weekday)
     # build a simple range
-    dates = [start + datetime.timedelta(days=d) for d in range(weekday+1)]
+    dates = [start + datetime.timedelta(days=d) for d in range(weekday + 1)]
     dates = [str(d) for d in dates]
 
     return dates
@@ -19,7 +19,7 @@ def weekday_from_date(date):
     day = os.popen('''date -d "'''+ date + '''" +%a''').read()
     return day[0:-1]
 
-W_Y = os.popen('''date +"W%U-%Y"''').read()[0:-1]
+W_Y = os.popen('''date +"W%V-%Y"''').read()[0:-1]
 user = os.getlogin()
 filename = "/home/"+user+"/.cache/Watcher/Analysis/"+W_Y+".csv"
 with open(filename, "w") as csvfile:
@@ -39,7 +39,7 @@ with open(filename, "w") as csvfile:
 
     for i in dates:
         x, y = rc.extract_data(str(i))
-        window_opened += x # smth is wrong here
+        window_opened += x
         time_spent += y
     for x, y in rc.final_report(window_opened, time_spent).items():
         csvwriter.writerow([y, x])

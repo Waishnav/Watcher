@@ -12,7 +12,7 @@ def daily_summary():
     rc.prints_report(window_opened, time_spent)
 
 def week_summary():
-    W_Y = os.popen('''date +"W%U-%Y"''').read()[0:-1]
+    W_Y = os.popen('''date +"W%V-%Y"''').read()[0:-1]
     user = os.getlogin()
     filename = "/home/"+user+"/.cache/Watcher/Analysis/"+W_Y+".csv"
     with open(filename, 'r') as file:
@@ -21,9 +21,9 @@ def week_summary():
         app_usages = dict()
         for row in csvreader:
             if len(row[0]) == 3:
-                week_overview.update({row[0]:row[1]})
+                week_overview.update({row[0]:row[1]}) # Weekday -- screen-time
             else:
-                app_usages.update({row[1]:row[0]})
+                app_usages.update({row[1]:row[0]}) # app-name -- usage
 
     week_screen_time = "00:00:00"
     for x, y in week_overview.items():
@@ -43,3 +43,6 @@ def week_summary():
         if x == "":
             x = "Home-Screen"
         print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
+
+if __name__ == "__main__":
+    week_summary()

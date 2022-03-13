@@ -50,6 +50,7 @@ def log_creation():
 
 
 if __name__ == "__main__":
+    os.popen('''python /usr/share/Watcher/week_analysis.py''')
     filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
     if not(os.path.isfile(filename)):
         with open(filename, 'a') as csvfile:

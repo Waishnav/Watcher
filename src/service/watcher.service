@@ -2,7 +2,7 @@
 Description=Get the perspective from Watcher about your Screen-Time
 
 [Service]
-ExecStart=/bin/python3 /usr/share/Watcher/watch_log.py
+ExecStart=/bin/python /usr/share/Watcher/watch_log.py
 Type=simple
 Restart=on-failure
 
