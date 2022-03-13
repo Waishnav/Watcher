@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 ## watcher --start == will starts the process of making csv
 # watcher --daily-summary == will give you your day overview till that point
