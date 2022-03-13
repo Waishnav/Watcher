@@ -16,7 +16,8 @@ Watcher is CLI-app (at this moment) which helps you to get perspective about you
 Day Summary             |  Week Summary
 :-------------------------:|:-------------------------:
 ![](https://cdn.discordapp.com/attachments/846673042893832195/952283314746691624/unknown.png)  |  ![](https://cdn.discordapp.com/attachments/846673042893832195/952283190716948521/unknown.png)
-## Info 
+
+Note: You might be thinking how can someone has 14hrs of screen time in a single day, Well ! short ans is AFK-feature is not implemented yet
 
 ## Installation
 Just clone this repo somewhere in your computer and cd into it and run install script according to your init system
