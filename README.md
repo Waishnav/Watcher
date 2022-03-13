@@ -19,10 +19,11 @@ Day Summary             |  Week Summary
 ## Info 
 
 ## Installation
-Just clone this repo somewhere in your computer and cd into it and run install script
+Just clone this repo somewhere in your computer and cd into it and run install script according to your init system
 ```bash 
-$ bash ./install.bash
+$ bash ./install-[init-system].bash
 ```
+for now manually add this path ```~/.local/bin/``` to your respective shell (bash, fish, zsh whatever)
 
 ## To-do
 - [ ] AFK feature
