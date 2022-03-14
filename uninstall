@@ -1,0 +1,13 @@
+#!/bin/bash
+sudo rm -rf /usr/share/Watcher/
+sudo rm -rf /usr/local/bin/watcher
+
+echo "Do you want to delete your raw_data files?? y or n (default: n)"
+read yes_or_no
+
+if [[ $yes_or_no = y ]]; then
+    rm -rf ~/.cache/Watcher/
+else
+    echo "Nice Decision either way you might use this app in future"
+fi
+

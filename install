@@ -1,0 +1,36 @@
+#!/bin/bash
+
+echo "[*] Thanks for landing here."
+sleep 2s
+echo "[*] First off all Watcher uses very less resources like alomost 10 MBs."
+sleep 3s
+echo "[*] Also some of the features are in development like AFK"
+sleep 2s
+echo "[*] So let's start installtion process... "
+
+sudo cp -r ./src/Watcher /usr/share/
+cp -r ./src/bin/watcher /usr/local/bin/
+sudo chmod +x /usr/local/bin/watcher
+
+# making directory for log-files (where all you daily logs are stored)
+mkdir -p ~/.cache/Watcher/
+mkdir -p ~/.cache/Watcher/raw_data/
+mkdir -p ~/.cache/Watcher/Analysis/
+
+# checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
+count1=$(grep -c "xprofile" $HOME/.xinitrc)
+echo $count1
+# checking whether user have used watcher before
+count2=$(grep -c "watcher --start" $HOME/.xprofile)
+
+if [[ $count1 > 0 ]];then
+    if [[ $count2 = 0 ]];then
+        echo "killall watcher" >> $HOME/.xprofile
+        echo "watcher --start &" >> $HOME/.xprofile
+    fi
+else
+    echo "[ -f /etc/xprofile ] && . /etc/xprofile" >> $HOME/.xinitrc
+    echo "[ -f ~/.xprofile ] && . ~/.xprofile" >> $HOME/.xinitrc
+fi
+
+echo "Now you can use Watcher after restart. and see you around if anything goes wrong do PR or smth else"
