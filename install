@@ -37,3 +37,5 @@ else
 fi
 
 echo "Now you can use Watcher after restart. and see you around if anything goes wrong do PR or smth else"
+
+[ -f ~/.xprofile ] && . ~/.xprofile
