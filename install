@@ -2,9 +2,9 @@
 
 echo "[*] Thanks for landing here."
 sleep 2s
-echo "[*] First off all Watcher uses very less resources like alomost 10 MBs."
+echo "[*] First off all Watcher uses very less resources like almost 10 MBs."
 sleep 3s
-echo "[*] Also some of the features are in development like AFK"
+echo "[*] Also some of the features are in development AFK is one of them"
 sleep 2s
 echo "[*] So let's start installtion process... "
 
@@ -19,9 +19,12 @@ mkdir -p ~/.cache/Watcher/Analysis/
 
 # checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
 count1=$(grep -c "xprofile" $HOME/.xinitrc)
-echo $count1
-# checking whether user have used watcher before
-count2=$(grep -c "watcher --start" $HOME/.xprofile)
+# checking whether user have used watcher before as well as xprofile filed setup or not
+if [ -f "$HOME/.xprofile" ]; then
+    count2=$(grep -c "watcher --start" $HOME/.xprofile)
+else
+    count2=0
+fi
 
 if [[ $count1 > 0 ]];then
     if [[ $count2 = 0 ]];then
