@@ -35,6 +35,13 @@ def append_line_in_csv(date, closed_time, window_name):
 afk = False
 def log_creation():
     global afk
+
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+    if not(os.path.isfile(filename)):
+        with open(filename, 'a') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter='\t')
+            csvwriter.writerow([get_time(), "00:00:00", "User-logged-in"])
+
     append_line_in_csv(get_date(), get_time(), "User-logged-in")
     while True:
         previous_window = x.active_window()
@@ -48,13 +55,5 @@ def log_creation():
             afk_closed_time = get_time()
             append_line_in_csv(date, afk_closed_time, "AFK")
 
-
 if __name__ == "__main__":
-    os.popen('''python /usr/share/Watcher/week_analysis.py''')
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
-    if not(os.path.isfile(filename)):
-        with open(filename, 'a') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter='\t')
-            csvwriter.writerow([get_time(), "00:00:00", ""])
-
     log_creation()
