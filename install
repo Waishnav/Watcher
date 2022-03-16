@@ -17,6 +17,13 @@ mkdir -p ~/.cache/Watcher/
 mkdir -p ~/.cache/Watcher/raw_data/
 mkdir -p ~/.cache/Watcher/Analysis/
 
+# resolving confilict with previous version of watcher
+if [ -f "$HOME/.config/systemd/user/watcher.service" ]; then
+    systemctl --user disable --now watcher.service
+    rm -rf $HOME/.config/systemd/user/watcher.service
+elif [ -f "$HOME/.local/bin/watcher" ]; then
+    rm -rf $HOME/.local/bin/watcher
+
 # checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
 count1=$(grep -c "xprofile" $HOME/.xinitrc)
 # checking whether user have used watcher before as well as xprofile filed setup or not
