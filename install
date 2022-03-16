@@ -9,7 +9,7 @@ sleep 2s
 echo "[*] So let's start installtion process... "
 
 sudo cp -r ./src/Watcher /usr/share/
-cp -r ./src/bin/watcher /usr/local/bin/
+sudo cp -r ./src/bin/watcher /usr/local/bin/
 sudo chmod +x /usr/local/bin/watcher
 
 # making directory for log-files (where all you daily logs are stored)
