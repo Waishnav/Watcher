@@ -53,7 +53,7 @@ def log_creation():
             if not(os.path.isfile(filename)):
                 with open(filename, 'a') as csvfile:
                     csvwriter = csv.writer(csvfile, delimiter='\t')
-                    prev_date = os.popen("""date -d "yesterday" '+%Y-%m-%d'""")
+                    prev_date = os.popen("""date -d "yesterday" '+%Y-%m-%d'""").read()[0:-1]
                     prev_file = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+prev_date+".csv"
                     with open(prev_file, 'r') as file:
                         last_app_time = file.readlines()[-1][0:8]
