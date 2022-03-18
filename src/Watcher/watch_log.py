@@ -35,6 +35,13 @@ def append_line_in_csv(date, closed_time, window_name):
 afk = False
 def log_creation():
     global afk
+
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+    if not(os.path.isfile(filename)):
+        with open(filename, 'a') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter='\t')
+            csvwriter.writerow([get_time(), "00:00:00", ""])
+
     append_line_in_csv(get_date(), get_time(), "User-logged-in")
     while True:
         filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
