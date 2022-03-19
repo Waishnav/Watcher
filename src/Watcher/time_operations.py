@@ -3,19 +3,22 @@ def time_difference(a,b): # b - a
     hr = int(b[0:2])-int(a[0:2])
     mn = int(b[3:5])-int(a[3:5])
     sec = int(b[6:8])-int(a[6:8])
-    if int(mn) < 0 and int(sec) < 0:
+    if mn < 0 and sec < 0:
         hr = hr - 1
         mn = 60 + mn - 1
         sec = 60 + sec
         if hr < 0:
             hr = hr + 24
-    elif int(mn) < 0 and int(sec) >= 0:
+    elif mn < 0 and sec >= 0:
         hr = hr - 1
         mn = 60 + mn
-    elif int(sec) < 0 and int(mn) > 0:
+    elif sec < 0 and mn > 0:
         sec = 60 + sec
         mn = mn - 1
-    elif int(sec) < 0 and int(mn) == 0:
+        if hr < 0:
+            hr = hr + 24
+
+    elif sec < 0 and mn == 0:
         hr = hr - 1
         mn = 59
         sec = 60 + sec
