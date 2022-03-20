@@ -6,7 +6,7 @@ echo "[✔] And...FYI Watcher uses very less resources like almost 10 MBs."
 sleep 2s
 echo "[✔] Also some of the features are in development AFK is one of them"
 sleep 2s
-echo "[✔] So let's start installtion process... "
+echo "[✔] So let's start installation process... "
 
 sudo cp -r ./src/Watcher /usr/share/
 echo "[✔] Copying Watcher to /usr/share/"
@@ -28,26 +28,14 @@ if [ -f "$HOME/.config/systemd/user/watcher.service" ]; then
     rm -rf $HOME/.config/systemd/user/watcher.service
 elif [ -f "$HOME/.local/bin/watcher" ]; then
     rm -rf $HOME/.local/bin/watcher
-
-# checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
-count1=$(grep -c "xprofile" $HOME/.xinitrc)
-# checking whether user have used watcher before as well as xprofile filed setup or not
-if [ -f "$HOME/.xprofile" ]; then
-    count2=$(grep -c "watcher --start" $HOME/.xprofile)
-else
-    count2=0
 fi
 
-echo "[✔] Making sure that it will run at starting of each xsession afterward"
-if [[ $count1 > 0 ]];then
-    if [[ $count2 = 0 ]];then
-        echo "killall watcher" >> $HOME/.xprofile
-        echo "watcher --start &" >> $HOME/.xprofile
-    fi
-else
-    echo "[ -f /etc/xprofile ] && . /etc/xprofile" >> $HOME/.xinitrc
-    echo "[ -f ~/.xprofile ] && . ~/.xprofile" >> $HOME/.xinitrc
-fi
+echo "[✔] Making sure that it will run at starting of each xsession afterward (if you use lightdm or startx"
+sed -i "source ~/.xprofile"  $HOME/.xinitrc # Sed needed to put at top of file
+echo "killall watcher" >> $HOME/.xprofile
+echo "watcher --start &" >> $HOME/.xprofile
+echo ". ~/.xinitrc" > ~/.xsession
 
+echo "If you do not use these 2 methods of starting X, add watcher to your list of autostart apps"
 echo "Now you can use Watcher after restart. and see you around if anything goes wrong do PR or open issue"
 echo '''If you wanna just give a try (without restart), You can start taking logs (run watch_log.py) by "watcher --start"'''
