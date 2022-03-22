@@ -13,7 +13,7 @@ echo "[✔] Copying Watcher to /usr/share/"
 sudo cp -r ./src/bin/watcher /usr/local/bin/
 echo "[✔] Copying watcher executable to /usr/local/bin/"
 sudo chmod +x /usr/local/bin/watcher
-echo "[✔] Making it executable by giving giving it permission"
+echo "[✔] Making it executable by giving it permission"
 
 # making directory for log-files (where all you daily logs are stored)
 mkdir -p ~/.cache/Watcher/
@@ -22,13 +22,16 @@ mkdir -p ~/.cache/Watcher/raw_data/
 mkdir -p ~/.cache/Watcher/Analysis/
 
 # resolving confilict with previous version of watcher
-echo "[✔] Checking whether you had installed previous version so removing conflicts if yes"
+echo "[✔] Checking whether you had installed previous version of Watcher so removing those conflicts if yes"
 if [ -f "$HOME/.config/systemd/user/watcher.service" ]; then
     systemctl --user disable --now watcher.service
     rm -rf $HOME/.config/systemd/user/watcher.service
 elif [ -f "$HOME/.local/bin/watcher" ]; then
     rm -rf $HOME/.local/bin/watcher
 fi
+
+# deleting folowing lines "[ -f /etc/xprofile ] && . /etc/xprofile/" and "[ -f ~/.xprofile ] && . ~/.xprofile"
+sed -i '/xprofile/d' ~/.xinitrc
 
 # checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
 count1=$(grep -c "xprofile" $HOME/.xinitrc)
