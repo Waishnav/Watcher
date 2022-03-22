@@ -14,13 +14,12 @@ def get_date():
     d = os.popen('''date +"%Y-%m-%d"''').read()
     return d[0:-1]
 
-def append_line_in_csv(date, closed_time, window_name):
+def append_line_in_csv(date, opened_time, closed_time, window_name):
     user = os.getlogin()
     filename = "/home/"+user+"/.cache/Watcher/raw_data/"+date+".csv"
-    with open(filename, 'r') as file:
-        last_app_time = file.readlines()[-1][0:8]
-
-    time_spent = time_difference(last_app_time, closed_time)
+#    with open(filename, 'r') as file:
+#        last_app_time = file.readlines()[-1][0:8]
+    time_spent = time_difference(opened_time, closed_time)
 
     Data = [closed_time, time_spent,  window_name]
     with open(filename, 'a') as csvfile:
@@ -41,27 +40,20 @@ def log_creation():
         with open(filename, 'a') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter='\t')
             csvwriter.writerow([get_time(), "00:00:00", ""])
-    append_line_in_csv(get_date(), get_time(), "User-logged-in")
+
+    # appending line at login
+    with open(filename, 'r') as file:
+       logged_out_time = file.readlines()[-1][0:8]
+    append_line_in_csv(get_date(), logged_out_time, get_time(), "User-logged-in")
 
     while True:
+        opened_at = get_time()
         previous_window = x.active_window()
         if x.is_window_changed(previous_window) and not(afk):
             next_window = x.active_window()
             closed_at = get_time() # for next_window its the opening time
             date = get_date()
-            filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+date+".csv"
-            if not(os.path.isfile(filename)):
-                with open(filename, 'a') as csvfile:
-                    csvwriter = csv.writer(csvfile, delimiter='\t')
-                    prev_date = os.popen("""date -d "yesterday" '+%Y-%m-%d'""").read()[0:-1]
-                    prev_file = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+prev_date+".csv"
-                    with open(prev_file, 'r') as file:
-                        last_app_time = file.readlines()[-1][0:8]
-                    csvwriter.writerow([get_time(), time_difference(last_app_time, closed_at), previous_window])
-
-            else:
-                # appends line when app gets closed
-                append_line_in_csv(date, closed_at, previous_window)
+            append_line_in_csv(date, opened_at, closed_at, previous_window)
 
         if afk:
             afk_closed_time = get_time()
