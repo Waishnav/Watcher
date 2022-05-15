@@ -1,4 +1,3 @@
-
 def time_difference(a,b): # b - a
     hr = int(b[0:2])-int(a[0:2])
     mn = int(b[3:5])-int(a[3:5])
@@ -9,9 +8,13 @@ def time_difference(a,b): # b - a
         sec = 60 + sec
         if hr < 0:
             hr = hr + 24
+
     elif mn < 0 and sec >= 0:
         hr = hr - 1
         mn = 60 + mn
+        if hr < 0:
+            hr = hr + 24
+
     elif sec < 0 and mn > 0:
         sec = 60 + sec
         mn = mn - 1
@@ -22,7 +25,6 @@ def time_difference(a,b): # b - a
         hr = hr - 1
         mn = 59
         sec = 60 + sec
-     #elif int(mn) < 0:
 
     hr = str(hr).zfill(2)
     mn = str(mn).zfill(2)
