@@ -1,16 +1,12 @@
 import os
 import time
 
-class window:
-    def __init__(self, class_name, title_name):
-        self.class_name = class_name
-        self.title_name = title_name
-
 # get classname of app that user working on
 def active_window():
-    # running bash command and storing result as a string
-    active_window = os.popen("xdotool getwindowfocus getwindowclassname").read()
-    active_window = active_window[0:-1]
+    # above command gives error on ubuntu cause of xdotool version is too old there while on arch it works
+#    active_window = os.popen("xdotool getwindowfocus getwindowclassname").read()
+    active_window_id = os.popen("xdotool getactivewindow").read()[:-1]
+    active_window = os.popen("xprop -id "+ str(active_window_id) +" | grep CLASS").read()[18::].split(",")[1].replace('''"''', "")
     return active_window
 
 # get title name of app that user working on
