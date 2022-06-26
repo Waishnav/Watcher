@@ -5,8 +5,9 @@ import time
 def active_window():
     # above command gives error on ubuntu cause of xdotool version is too old there while on arch it works
 #    active_window = os.popen("xdotool getwindowfocus getwindowclassname").read()
-    active_window_id = os.popen("xdotool getactivewindow").read()[:-1]
-    active_window = os.popen("xprop -id "+ str(active_window_id) +" | grep CLASS").read()[18::].split(",")[1].replace('''"''', "")
+    active_window = os.popen("ps -e | grep $(xdotool getwindowpid $(xdotool getwindowfocus)) | grep -v grep | awk '{print $4}'").read()[:-1]
+    if "\n" in active_window:
+        active_window = "unknown"
     return active_window
 
 # get title name of app that user working on
