@@ -21,41 +21,38 @@ echo "[✔] To store raw_data making directory as ~/.cache/Watcher"
 mkdir -p ~/.cache/Watcher/raw_data/
 mkdir -p ~/.cache/Watcher/Analysis/
 
-# resolving confilict with previous version of watcher
-echo "[✔] Checking whether you had installed previous version of Watcher so removing those conflicts if yes"
-if [ -f "$HOME/.config/systemd/user/watcher.service" ]; then
-    systemctl --user disable --now watcher.service
-    rm -rf $HOME/.config/systemd/user/watcher.service
-elif [ -f "$HOME/.local/bin/watcher" ]; then
-    rm -rf $HOME/.local/bin/watcher
-fi
-
 # deleting folowing lines "[ -f /etc/xprofile ] && . /etc/xprofile/" and "[ -f ~/.xprofile ] && . ~/.xprofile"
-sed -i '/xprofile/d' ~/.xinitrc
-
-# checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
-count1=$(grep -c "xprofile" $HOME/.xinitrc)
+if [ -f "$HOME/.xinitrc" ];
+then
+    sed -i '/xprofile/d' ~/.xinitrc
+    # checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
+    count1=$(grep -c "xprofile" $HOME/.xinitrc)
+else
+    count1=0
+fi
 # checking whether user have used watcher before as well as xprofile filed setup or not
-if [ -f "$HOME/.xprofile" ]; then
+if [ -f "$HOME/.xprofile" ];
+then
     count2=$(grep -c "watcher --start" $HOME/.xprofile)
 else
     count2=0
 fi
 
-echo "[✔] Making sure that it will run at starting of each xsession afterward"
+echo "[✔] Making sure that it will run at startup of the system"
 
-if [ $count1 = 0 ] & [ $count2 = 0 ];then
-    sed -i '/bin/a \source ~/.xprofile' ~/.xinitrc
-    echo "killall watcher" >> $HOME/.xprofile
-    echo "watcher --start &" >> $HOME/.xprofile
-elif [ $count1 > 0 ] & [ $count2 = 0 ];then
-    echo "killall watcher" >> $HOME/.xprofile
-    echo "watcher --start &" >> $HOME/.xprofile
-elif [ $count2 > 0 ] & [ $count1 = 0 ];then
-    sed -i '/bin/a \source ~/.xprofile' ~/.xinitrc
+if [ $count2 = 0 ];
+then
+   echo "watcher --start &" >> $HOME/.xprofile
 fi
 
-echo ""
+if [ -f "$HOME/.xinitrc" ];
+then
+    if [ $count1 = 0 ] ;
+    then
+        echo "source ~/.xprofile" >> $HOME/.xinitrc
+    fi
+fi
+
 echo "Now you can use Watcher after restart. And see you around"
 echo "If anything goes wrong do PR or open issue"
-echo "If you wanna just give a try (without restart), You can start taking logs (run watch_log.py) by 'watcher --start' "
+echo '''If you wanna just give a try (without restart), You can start taking logs (run watch_log.py) by 'watcher --start' '''

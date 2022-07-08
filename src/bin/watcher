@@ -1,11 +1,11 @@
-#!/usr/bin/python3
-
+#!/usr/bin/python
 import os
 import sys
 sys.path.insert(0, "/usr/share/Watcher/")
 import watch_log as x
-from colored_text import Color
+from commands import Color
 import commands as cmd
+from analysis import weeklly_logs
 
 def help_option():
     print(Color.BLUE("Watcher") + " - Minimal open source screen-time tracker\n")
@@ -23,15 +23,15 @@ try:
     if arg == "-ds" or arg == "--day-summary":
         cmd.daily_summary()
     elif arg == "-ws" or arg == "--week-summary":
-        os.popen("python3 /usr/share/Watcher/week_analysis.py")
+        weeklly_logs()
         cmd.week_summary()
     elif arg == "-h" or arg == "--help":
         help_option()
     elif arg == "--start":
-        print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C)")
+        print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C or Ctrl+C)")
         x.log_creation()
     elif arg == "--version":
-        print("Version: 1.0")
+        print("Version: 1.2")
     else:
         print(Color.RED("Wrong")+" [OPTION] choosen. Have a look at the Options!!\n")
         print(Color.YELLOW("OPTIONS"))

@@ -1,9 +1,8 @@
-import csv
 import os
-import time_operations as to
+import csv
 from watch_log import get_date
-from colored_text import Color
 import datetime
+import time_operations as to
 
 def extract_data(date):
     user = os.getlogin()
@@ -55,28 +54,45 @@ def final_report(window_opened, time_spent):
 
     return sorted_report
 
-# ░ ▒ █ ───
-#print("▒▒▒\t▒▒▒\n███")
+# getting dates of the week for week summary
+def get_dates():
+    theday = datetime.date.today()
+    weekday = theday.isoweekday() - 1
+    # The start of the week
+    start = theday - datetime.timedelta(days=weekday)
+    # build a simple range
+    dates = [start + datetime.timedelta(days=d) for d in range(weekday + 1)]
+    dates = [str(d) for d in dates]
 
-def prints_report(window_opened, time_spent):
-    Total_screen_time = "00:00:00"
-    for x,y in final_report(window_opened, time_spent).items():
-        Total_screen_time = to.time_addition(y, Total_screen_time)
+    return dates
 
-    if len(to.format_time(Total_screen_time)) == 3:
-        print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>16}'))
-    elif len(to.format_time(Total_screen_time)) == 7:
-        print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>11}'))
-    elif len(to.format_time(Total_screen_time)) == 11:
-            print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(to.format_time(Total_screen_time)))
+def weekday_from_date(date):
+    day = os.popen('''date -d "'''+ date + '''" +%a''').read()
+    return day[0:-1]
 
-    print(" ────────────────────────────────────────────────")
-    print(Color.RED(f'{" App Usages":>29}'))
-    print(" ────────────────────────────────────────────────")
+def weeklly_logs():
+    W_Y = os.popen('''date +"W%V-%Y"''').read()[0:-1]
+    user = os.getlogin()
+    filename = "/home/"+user+"/.cache/Watcher/Analysis/"+W_Y+".csv"
+    with open(filename, "w") as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter='\t')
+        #csvwriter.writerow(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
+        dates = get_dates()
 
-    for x,y in final_report(window_opened, time_spent).items():
-        if x == "":
-            x = "Home-Screen"
-        print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
+        window_opened = list()
+        time_spent = list()
+        for i in dates:
+            window_opened, time_spent = extract_data(i)
+            Total_screen_time = "00:00:00"
+            for x, y in final_report(window_opened, time_spent).items():
+                Total_screen_time = to.time_addition(y, Total_screen_time)
 
+            csvwriter.writerow([weekday_from_date(i), Total_screen_time])
+
+        for i in dates:
+            x, y = extract_data(str(i))
+            window_opened += x
+            time_spent += y
+        for x, y in final_report(window_opened, time_spent).items():
+            csvwriter.writerow([y, x])
 
