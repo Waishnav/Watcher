@@ -2,14 +2,61 @@ import os
 import csv
 import datetime
 from watch_log import get_date
-import report_creation as rc
-from colored_text import Color
+import analysis as anls
 import time_operations as to
+
+class Color:
+
+    def GREY(text):
+        return '\033[90m' + text + '\033[0m'
+
+    def BLUE(text):
+        return '\033[34m' + text + '\033[0m'
+
+    def GREEN(text):
+        return '\033[32m' + text + '\033[0m'
+
+    def YELLOW(text):
+        return '\033[33m' + text + '\033[0m'
+
+    def RED(text):
+        return '\033[31m' + text + '\033[0m'
+
+    def PURPLE(text):
+        return '\033[35m' + text + '\033[0m'
+
+    def DARKCYAN(text):
+        return '\033[36m' + text + '\033[0m'
+
+    def BOLD(text):
+        return '\033[1m' + text + '\033[0m'
+
+    def UNDERLINE(text):
+        return '\033[4m' + text + '\033[0m'
+
 
 def daily_summary():
     date = get_date()
-    window_opened, time_spent = rc.extract_data(date)
-    rc.prints_report(window_opened, time_spent)
+    window_opened, time_spent = anls.extract_data(date)
+    Total_screen_time = "00:00:00"
+    for x,y in anls.final_report(window_opened, time_spent).items():
+        Total_screen_time = to.time_addition(y, Total_screen_time)
+
+    if len(to.format_time(Total_screen_time)) == 3:
+        print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>16}'))
+    elif len(to.format_time(Total_screen_time)) == 7:
+        print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(f'{to.format_time(Total_screen_time):>11}'))
+    elif len(to.format_time(Total_screen_time)) == 11:
+            print(Color.YELLOW("\n   Today's Screen-Time\t\t   ") + Color.BLUE(to.format_time(Total_screen_time)))
+
+    print(" ────────────────────────────────────────────────")
+    print(Color.RED(f'{" App Usages":>29}'))
+    print(" ────────────────────────────────────────────────")
+
+    for x,y in anls.final_report(window_opened, time_spent).items():
+        if x == "":
+            x = "Home-Screen"
+        print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
 
 def week_summary():
     W_Y = os.popen('''date +"W%V-%Y"''').read()[0:-1]
@@ -35,7 +82,7 @@ def week_summary():
     for x, y in week_overview.items():
         print("  " + f'{Color.YELLOW(x):>21}' + "\t\t   " + Color.BLUE(to.format_time(y)))
 
-    #rc.prints_report(window_opened, time_spent, is_week)
+    #anls.prints_report(window_opened, time_spent, is_week)
     print(" ────────────────────────────────────────────────")
     print(Color.RED(f'{" App Usages":>29}'))
     print(" ────────────────────────────────────────────────")

@@ -5,6 +5,7 @@ sys.path.insert(0, "/usr/share/Watcher/")
 import watch_log as x
 from commands import Color
 import commands as cmd
+from analysis import weeklly_logs
 
 def help_option():
     print(Color.BLUE("Watcher") + " - Minimal open source screen-time tracker\n")
@@ -22,12 +23,12 @@ try:
     if arg == "-ds" or arg == "--day-summary":
         cmd.daily_summary()
     elif arg == "-ws" or arg == "--week-summary":
-
+        weeklly_logs()
         cmd.week_summary()
     elif arg == "-h" or arg == "--help":
         help_option()
     elif arg == "--start":
-        print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C)")
+        print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C or Ctrl+C)")
         x.log_creation()
     elif arg == "--version":
         print("Version: 1.2")
