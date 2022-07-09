@@ -14,10 +14,6 @@ def time_difference(a,b): # b - a
         mn = 60 + mn
         if hr < 0:
             hr = hr + 24
-<<<<<<< HEAD
-
-=======
->>>>>>> afk_feature
     elif sec < 0 and mn > 0:
         sec = 60 + sec
         mn = mn - 1

@@ -44,7 +44,7 @@ def active_window():
 # returns true if user has move to next app which is not the same as previous
 def is_window_changed(a):
     result = False
-    time.sleep(0.1)
+    time.sleep(0.5)
     b = active_window()
     if a != b :
         result = True

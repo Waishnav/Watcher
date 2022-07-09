@@ -43,16 +43,18 @@ def log_creation():
             next_actv_window = x.active_window()
             date = get_date()
             opened_at = get_time()
-            time_spent = "00:00:00"
+            time.sleep(0.5)
+            time_spent = "00:00:01"
             append_line_in_csv(date, opened_at, time_spent, next_actv_window)
 
         else:
+            actv_window = x.active_window()
             date = get_date()
             now = get_time() # for next_window its the opening time
             last_line = os.popen("tail -n1 " + filename).read().split("\t")
             opened_at = last_line[0]
             os.popen("""sed -i -e '$ d' """ + filename)
-            time.sleep(0.2)
+            time.sleep(1)
             time_spnt = time_difference(opened_at, get_time())
 
             if afk.IsAFK():
