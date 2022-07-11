@@ -1,11 +1,7 @@
 import os
 import time
+from afk import get_afk_status
 from ewmh import EWMH
-
-class window:
-    def __init__(self, class_name, title_name):
-        self.class_name = class_name
-        self.title_name = title_name
 
 # get title name of app that user working on
 def active_window_title():
@@ -35,20 +31,29 @@ def active_window():
     aw_title = active_window_title()
     terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm"]
     if active_window in terminals:
-        if "Nvim" in aw_title:
-            active_window = "NeoVim"
-        elif "Vim" in aw_title:
-            active_window = "Vim"
+        try:
+            if "Nvim" in aw_title:
+                active_window = "NeoVim"
+            elif "Vim" in aw_title:
+                active_window = "Vim"
+        except TypeError:
+            None
     return active_window
 
 # returns true if user has move to next app which is not the same as previous
-def is_window_changed(a):
+def is_window_changed(a, afk, timeout):
     result = False
-    time.sleep(0.5)
-    b = active_window()
-    if a != b :
-        result = True
+    while not(result):
+        time.sleep(1)
+        b = active_window()
+        if a != b :
+            result = True
+        elif get_afk_status(afk, timeout):
+            result = True
+        else:
+            result = False
     return result
+
 
 ### what to do after window get change I've to append one line in csv data file in following format
 ### opened-time      closed-time      time-spent     window_class_name      window_title_name

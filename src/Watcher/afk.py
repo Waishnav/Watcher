@@ -1,14 +1,19 @@
 import os
-def IsAFK():
-    time_since_last_input = int(os.popen("xprintidle").read())
-    if time_since_last_input >= 300000: # 3min no input == AFK
-        video_playback = os.popen("""pacmd list-sink-inputs  | grep -w state | grep -i 'CORKED'""").read()
-        # if playback is not running as well as user is AFK
-        if "CORKED" in video_playback:
-            return True
-        # if playback is running is background as well as user is AFK
-        else:
-            return False
+
+# checks if currently in afk mode, only returns true once
+def get_afk_status(afk_active, timeout):
+    if (is_afk(timeout)):
+        return True
+    elif returned_from_afk(afk_active, timeout):
+        return True
     else:
         return False
 
+def returned_from_afk(afk_active, timeout):
+    has_returned = (afk_active and not (is_afk(timeout)))
+    return has_returned
+
+def is_afk(timeout):
+    timeout = timeout * 60 * 1000
+    #If the AFK feature is installed
+    return (int((os.popen("xprintidle").read())) > timeout)
