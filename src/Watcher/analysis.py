@@ -39,6 +39,10 @@ def final_report(window_opened, time_spent):
     #print(report)
     if "User-logged-in" in report.keys():
         report.pop("User-logged-in")
+    if "AFK" in report.keys():
+        report.pop("AFK")
+    if "Unknown" in report.keys():
+        report.pop("Unknown")
     # sort report dictonary in decreasing order of Usages
     sorted_values = []
     for x,y in report.items():

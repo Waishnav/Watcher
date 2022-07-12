@@ -1,33 +1,27 @@
 import os
 import time
 from afk import get_afk_status
-from ewmh import EWMH
 
 # get title name of app that user working on
 def active_window_title():
-    try:
-        win = EWMH().getActiveWindow()
-        active_window_title = win.get_wm_name()
-    except AttributeError:
-        active_window_title = "unknown"
+    active_window_title = os.popen("""xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | sed -nr 's/.*= "(.*)"$/\1/p'""").read()[:-1]
+    if "XGetWindowProperty[_NET_ACTIVE_WINDOW] failed" in active_window_title:
+        active_window_title = ""
+    if "\n" in active_window_title:
+        active_window_title = "Unknown"
     active_window_title = active_window_title.capitalize()
     return active_window_title
 
 # get classname of app that user working on
 def active_window():
-    try:
-        win = EWMH().getActiveWindow()
-        active_window = win.get_wm_class()[1]
-    except AttributeError:
-        active_window = "unknown"
+    active_window = os.popen("xprop -id $(xdotool getactivewindow) | grep CLASS | awk '{print $4}'").read()[:-1].replace('''"''', "")
 
-    if len(active_window) > 20:
-        active_window = "unknown"
-    elif "\n" in active_window:
-        active_window = "unknown"
-    active_window = active_window.capitalize()
-
+    if "XGetWindowProperty[_NET_ACTIVE_WINDOW] failed" in active_window:
+        active_window = ""
+    if "\n" in active_window:
+        active_window = "Unknown"
     # check whether user is using nvim or vim
+    active_window = active_window.capitalize()
     aw_title = active_window_title()
     terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm"]
     if active_window in terminals:
