@@ -14,7 +14,7 @@ def active_window_title():
 
 # get classname of app that user working on
 def active_window():
-    active_window = os.popen("xprop -id $(xdotool getactivewindow) | grep CLASS | awk '{print $4}'").read()[:-1].replace('''"''', "")
+    active_window = os.popen("xprop -id $(xdotool getactivewindow) | grep CLASS ").read()[19:-1].replace('''"''', "").split(", ")[0]
 
     if "XGetWindowProperty[_NET_ACTIVE_WINDOW] failed" in active_window:
         active_window = ""
@@ -49,6 +49,7 @@ def is_window_changed(a, afk, timeout):
     return result
 
 
+print(active_window())
 ### what to do after window get change I've to append one line in csv data file in following format
 ### opened-time      closed-time      time-spent     window_class_name      window_title_name
 

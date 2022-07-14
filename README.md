@@ -36,5 +36,5 @@ $ chmod +x ./install && ./install
 ```
 
 ## To-do
-- [ ] AFK feature
+- [x] AFK feature
 - [ ] GUI only if got 300 stars Probably [Tauri App](https://github.com/tauri-apps/tauri).
