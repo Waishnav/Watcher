@@ -27,7 +27,7 @@ try:
         cmd.week_summary()
     elif arg == "-h" or arg == "--help":
         help_option()
-    elif arg == "--start":
+    elif arg == "--start" or arg == "-s":
         print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C or Ctrl+C)")
         x.log_creation()
     elif arg == "--version":
