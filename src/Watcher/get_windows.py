@@ -42,7 +42,7 @@ def active_window():
 def is_window_changed(a, afk, timeout):
     result = False
     while not(result):
-        time.sleep(1)
+        time.sleep(0.5)
         b = active_window()
         if a != b :
             result = True
