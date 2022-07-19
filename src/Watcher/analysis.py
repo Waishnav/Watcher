@@ -66,7 +66,7 @@ def get_sunday_of_week(week):
     return first + datetime.timedelta(days=base - first.isocalendar()[2] + 7 * (week - 1)) + datetime.timedelta(days=6.9)
 
 # getting dates of particular week for week summary
-def get_dates(theday=datetime.date.today()):
+def week_dates(theday=datetime.date.today()):
     weekday = theday.isoweekday() - 1
     # The start of the week (Monday)
     start = theday - datetime.timedelta(days=weekday)
@@ -79,17 +79,17 @@ def weekday_from_date(date):
     day = os.popen('''date -d "'''+ date + '''" +%a''').read()
     return day[0:-1]
 
-def weekly_logs(week = str(os.popen('''date +"w%v-%y"''').read()[0:-1])):
+def weekly_logs(week = str(os.popen('''date +"W%V-%Y"''').read()[0:-1])):
     user = os.getlogin()
     filename = "/home/"+user+"/.cache/Watcher/Analysis/"+week+".csv"
     with open(filename, "w") as csvfile:
         csvwriter = csv.writer(csvfile, delimiter='\t')
         #csvwriter.writerow(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
 
-        if os.popen('''date +"w%v-%y"''').read()[0:-1] == week:
-            dates = get_date()
+        if os.popen('''date +"W%V-%Y"''').read()[0:-1] == week:
+            dates = week_dates()
         else:
-            dates = get_dates(get_sunday_of_week(week))
+            dates = week_dates(get_sunday_of_week(week))
 
         window_opened = list()
         time_spent = list()
@@ -110,5 +110,5 @@ def weekly_logs(week = str(os.popen('''date +"w%v-%y"''').read()[0:-1])):
 
 #testing
 if __name__ == "__main__":
-    print(get_dates(get_sunday_of_week("W27-2022")))
-    weekly_logs("W27-2022")
+    weekly_logs("W29-2022")
+

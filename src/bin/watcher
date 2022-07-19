@@ -54,12 +54,18 @@ elif len(arg) == 3:
     if arg[1] == "-ds" or arg[1] == "--day-summary":
         if len(arg[2]) == 10:
             cmd.daily_summary(str(arg[2]))
+        elif arg[2] == "--yestarday" or arg[2] == "-y":
+            cmd.daily_summary(os.popen("""date -d "1 day ago" '+%Y-%m-%d'""").read()[:-1])
         else:
             wrong_option()
     elif arg[1] == "-ws" or arg[1] == "--week-summary":
         if len(arg[2]) == 8:
             weekly_logs(str(arg[2]))
             cmd.week_summary(str(arg[2]))
+        elif arg[2] == "--previous_week" or arg[2] == "-pw":
+            prev_week=os.popen("""date -d 'last week' '+W%W-%Y'""").read()[:-1]
+            weekly_logs(prev_week)
+            cmd.week_summary(prev_week)
         else:
             wrong_option()
     else:
@@ -71,3 +77,4 @@ else:
 #parser.add_argument()
 #args = parser.parse_args()
 #print(args)
+

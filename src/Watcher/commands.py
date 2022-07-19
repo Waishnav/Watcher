@@ -90,6 +90,9 @@ def week_summary(week = os.popen('''date +"W%V-%Y"''').read()[:-1]):
 
     if week == os.popen('''date +"W%V-%Y"''').read()[:-1]:
         print(Color.PURPLE("\n   Week's screen-time\t\t   ") + Color.BLUE(to.format_time(week_screen_time)))
+    elif week == os.popen("""date -d 'last week' '+W%W-%Y'""").read()[:-1]:
+        print(Color.PURPLE("\n   Previous Week's \t\t   ") + Color.BLUE(to.format_time(week_screen_time)))
+        print(Color.PURPLE("     Screen-Time"))
     else:
         print(Color.PURPLE("\n     "+week[1:3]+ "th week of\t   ") + Color.BLUE(to.format_time(week_screen_time)))
         print(Color.PURPLE("   "+week[4:] +" screen-time\t    "))
