@@ -5,43 +5,68 @@ sys.path.insert(0, "/usr/share/Watcher/")
 import watch_log as x
 from commands import Color
 import commands as cmd
-from analysis import weeklly_logs
+from analysis import weekly_logs
 
 def help_option():
     print(Color.BLUE("Watcher") + " - Minimal open source screen-time tracker\n")
     print(Color.YELLOW("USAGE:")+"\n\t watcher [OPTION]\n")
     print(Color.YELLOW("OPTIONS"))
-    print("\t-ds, --day-summary       Displays where you have spend your time of that day")
-    print("\t-ws, --week-summary      Displays screen-time of each day of week")
+    print("\t-ds, --day-summary       Shows today's screen-time and app-usage")
+    print("\t-ds [date]               Shows that day's screen-time and app-usage\n\t\t\t\t\t (if date is not given then date=today's date)")
+    print("\t-ws, --week-summary      Shows screen-time of each day of that running week")
+    print("\t-ws [week]               Shows screen-time of each day of that week given by you")
     print("\t-s, --start              It starts taking logs afterwards in following directory ~/.cache/Watcher/raw_data/")
-    print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
+    print(Color.YELLOW("\nEXAMPLE COMMANDS"))
+    print("\twatcher -ds 2022-01-31")
+    print("\twatcher -ws W01-2022")
+    print("\nFor more information see github repo: "+ Color.BLUE("https://github.com/Waishnav/Watcher") +" and Don't forget to star the repo")
+
+def wrong_option():
+    print(Color.RED("Wrong")+" [OPTION] choosen. Have a look at the Options!!\n")
+    print(Color.YELLOW("OPTIONS"))
+    print("\t-ds or --day-summary [date]      Displays where you have spend your time of that day")
+    print("\t-ws or --week-summary [week]     Displays screen-time of each day of week")
+    print(Color.YELLOW("\nEXAMPLE COMMANDS"))
+    print("\twatcher -ds 2022-01-31")
+    print("\twatcher -ws W01-2022")
+    print("\nFor more information see github repo: "+ Color.BLUE("https://github.com/Waishnav/Watcher") +" and Don't forget to star the repo")
 
 
 #print("▒▒▒\t▒▒▒\n███")
-try:
-    arg = sys.argv[1]
-    if arg == "-ds" or arg == "--day-summary":
+arg = sys.argv
+if len(arg) == 2:
+    if arg[1] == "-ds" or arg[1] == "--day-summary":
         cmd.daily_summary()
-    elif arg == "-ws" or arg == "--week-summary":
-        weeklly_logs()
+    elif arg[1] == "-ws" or arg[1] == "--week-summary":
+        weekly_logs()
         cmd.week_summary()
-    elif arg == "-h" or arg == "--help":
+    elif arg[1] == "-h" or arg[1] == "--help":
         help_option()
-    elif arg == "--start" or arg == "-s":
+    elif arg[1] == "--start" or arg[1] == "-s":
         print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C or Ctrl+C)")
         x.log_creation()
-    elif arg == "--version":
-        print("Version: 1.2")
+    elif arg[1] == "--version" or arg[1] == "-v":
+        print("Version: 1.3")
     else:
-        print(Color.RED("Wrong")+" [OPTION] choosen. Have a look at the Options!!\n")
-        print(Color.YELLOW("OPTIONS"))
-        print("\t-ds, --day-summary     Displays where you have spend your time of that day")
-        print("\t-ws, --week-summary      Displays screen-time of each day of week")
-        print("\nFor more information see github repo: https://github.com/Waishnav/Watcher and Don't forget to star the repo")
+        wrong_option()
 
-except IndexError:
-    help_option()
+elif len(arg) == 3:
+    if arg[1] == "-ds" or arg[1] == "--day-summary":
+        if len(arg[2]) == 10:
+            cmd.daily_summary(str(arg[2]))
+        else:
+            wrong_option()
+    elif arg[1] == "-ws" or arg[1] == "--week-summary":
+        if len(arg[2]) == 8:
+            weekly_logs(str(arg[2]))
+            cmd.week_summary(str(arg[2]))
+        else:
+            wrong_option()
+    else:
+        wrong_option()
 
+else:
+    wrong_option()
 #parser = argparse.ArgumentParser(description="Minimal open source screen-time calulator for digitally wellbeing")
 #parser.add_argument()
 #args = parser.parse_args()

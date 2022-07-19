@@ -3,7 +3,7 @@
 echo "[✔] First of all Thanks for dropping by!."
 sleep 1s
 echo "[✔] And...FYI Watcher uses very less resources like almost 10 MBs."
-sleep 2s
+sleep 1s
 echo "[✔] Also some of the features are in development AFK is one of them"
 sleep 2s
 echo "[✔] So let's start installation process... "
