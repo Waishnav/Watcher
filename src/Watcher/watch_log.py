@@ -47,15 +47,23 @@ def log_creation():
 
         if (y.returned_from_afk(afk, afkTimeout)):
             previous_window = "AFK"
+            opened_at = os.popen(" tail -n1 "+ filename).read().split("\t")[0]
             afk = False
 
         if (x.is_window_changed(previous_window, afk, afkTimeout) and not afk):
             if(y.is_afk(afkTimeout)):
                 afk = True
-            closed_at = get_time() # for next_window its the opening time
+                # minimizing error
+                closed_at = time_difference("00:02:58", get_time())
+            else:
+                closed_at = get_time() # for next_window its the opening time
+
             date = get_date()
             filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+date+".csv"
             append_line_in_csv(date, opened_at, closed_at, previous_window)
 
 if __name__ == "__main__":
-    log_creation()
+    #log_creation()
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+    opened_at = os.popen(" tail -n1 "+ filename).read().split("\t")[0]
+    print(opened_at)

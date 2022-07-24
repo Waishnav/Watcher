@@ -4,12 +4,13 @@ from afk import get_afk_status
 
 # get title name of app that user working on
 def active_window_title():
-    active_window_title = os.popen("""xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | sed -nr 's/.*= "(.*)"$/\1/p'""").read()[:-1]
+    active_window_title = os.popen('''xprop -id $(xdotool getwindowfocus) WM_NAME''').read()[19:-2]
+    a = active_window_title.find('"')
+    active_window_title = active_window_title[a+1:]
     if "XGetWindowProperty[_NET_ACTIVE_WINDOW] failed" in active_window_title:
         active_window_title = ""
     if "\n" in active_window_title:
         active_window_title = "Unknown"
-    active_window_title = active_window_title.capitalize()
     return active_window_title
 
 # get classname of app that user working on
@@ -30,9 +31,9 @@ def active_window():
     terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm"]
     if active_window in terminals:
         try:
-            if "Nvim" in aw_title:
+            if "nvim" in aw_title:
                 active_window = "NeoVim"
-            elif "Vim" in aw_title:
+            elif "vim" in aw_title:
                 active_window = "Vim"
         except TypeError:
             None
@@ -57,3 +58,8 @@ def is_window_changed(a, afk, timeout):
 ### opened-time      closed-time      time-spent     window_class_name      window_title_name
 
 ### and whenever the user puts particular command it will make report till the time for that day and shows that report in terminal
+if __name__ == "__main__":
+    while True:
+        time.sleep(1)
+        print(active_window_title())
+        print(os.popen('''xdotool getwindowfocus getwindowname''').read())
