@@ -47,7 +47,11 @@ def log_creation():
 
         if (y.returned_from_afk(afk, afkTimeout)):
             previous_window = "AFK"
-            opened_at = os.popen(" tail -n1 "+ filename).read().split("\t")[0]
+            if os.path.exists(filename):
+                opened_at = os.popen(" tail -n1 "+ filename).read().split("\t")[0]
+            else:
+                previous_date = os.popen("""date -d "1 day ago" '+%Y-%m-%d'""").read()[:-1]
+                opened_at = os.popen(" tail -n1 ~/.cache/Watcher/raw_data/"+previous_date+".csv").read().split("\t")[0]
             afk = False
 
         if (x.is_window_changed(previous_window, afk, afkTimeout) and not afk):
