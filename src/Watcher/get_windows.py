@@ -19,7 +19,9 @@ def active_window():
     if len(actv_id) == 4:
         active_window = ""
     else:
-        active_window = os.popen("xprop -id $(xdotool getwindowfocus) | grep CLASS ").read()[19:-1].replace('''"''', "").split(", ")[1]
+        active_window = os.popen("xprop -id $(xdotool getwindowfocus) | grep CLASS ").read()
+        if active_window != "":
+            active_window = active_window[19:-1].replace('''"''', "").split(", ")[1]
 
     if "XGetWindowProperty[_NET_ACTIVE_WINDOW] failed" in active_window:
         active_window = ""
