@@ -1,11 +1,12 @@
 #!/usr/bin/python
 import os
+from datetime import datetime
 import sys
 sys.path.insert(0, "/usr/share/Watcher/")
 import watch_log as x
 from commands import Color
 import commands as cmd
-from analysis import weekly_logs
+from analysis import weekly_logs, get_total_screen_time_for_day
 
 def help_option():
     print(Color.BLUE("Watcher") + " - Minimal open source screen-time tracker\n")
@@ -16,6 +17,7 @@ def help_option():
     print("\t-ws, --week-summary      Shows screen-time of each day of that running week")
     print("\t-ws [week]               Shows screen-time of each day of that week given by you")
     print("\t-s, --start              It starts taking logs afterwards in following directory ~/.cache/Watcher/raw_data/")
+    print("\t-dt, --day-total              Shows daily total screen time")
     print(Color.YELLOW("\nEXAMPLE COMMANDS"))
     print("\twatcher -ds 2022-01-31")
     print("\twatcher -ws W01-2022")
@@ -47,6 +49,8 @@ if len(arg) == 2:
         x.log_creation()
     elif arg[1] == "--version" or arg[1] == "-v":
         print("Version: 1.3.1")
+    elif arg[1] == '--day-total' or arg[1] == '-dt':
+        print(get_total_screen_time_for_day(str(datetime.now().date())))
     else:
         wrong_option()
 

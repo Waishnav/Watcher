@@ -79,6 +79,14 @@ def weekday_from_date(date):
     day = os.popen('''date -d "'''+ date + '''" +%a''').read()
     return day[0:-1]
 
+def get_total_screen_time_for_day(date):
+        window_opened, time_spent = extract_data(date)
+        Total_screen_time = "00:00:00"
+        for x, y in final_report(window_opened, time_spent).items():
+            Total_screen_time = to.time_addition(y, Total_screen_time)
+        return Total_screen_time
+
+
 def weekly_logs(week = str(os.popen('''date +"W%V-%Y"''').read()[0:-1])):
     user = os.getlogin()
     filename = "/home/"+user+"/.cache/Watcher/Analysis/"+week+".csv"
@@ -94,10 +102,8 @@ def weekly_logs(week = str(os.popen('''date +"W%V-%Y"''').read()[0:-1])):
         window_opened = list()
         time_spent = list()
         for i in dates:
-            window_opened, time_spent = extract_data(i)
-            Total_screen_time = "00:00:00"
-            for x, y in final_report(window_opened, time_spent).items():
-                Total_screen_time = to.time_addition(y, Total_screen_time)
+
+            Total_screen_time = get_total_screen_time_for_day(i)
 
             csvwriter.writerow([weekday_from_date(i), Total_screen_time])
 
