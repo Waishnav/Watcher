@@ -35,9 +35,8 @@ class Color:
         return '\033[4m' + text + '\033[0m'
 
 def daily_summary(date = get_date()):
-    window_opened, time_spent = anls.extract_data(date)
     Total_screen_time = "00:00:00"
-    for x,y in anls.final_report(window_opened, time_spent).items():
+    for x,y in anls.final_report(date).items():
         Total_screen_time = to.time_addition(y, Total_screen_time)
 
     if date == get_date():
@@ -66,7 +65,7 @@ def daily_summary(date = get_date()):
     print(Color.RED(f'{" App Usages":>29}'))
     print(" ────────────────────────────────────────────────")
 
-    for x,y in anls.final_report(window_opened, time_spent).items():
+    for x,y in anls.sort_data(anls.final_report(date)).items():
         if x == "":
             x = "Home-Screen"
         print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
