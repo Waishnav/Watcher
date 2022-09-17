@@ -1,0 +1,83 @@
+#!/usr/bin/python
+import os
+import sys
+sys.path.insert(0, "/usr/share/Watcher/")
+import csv
+from watch_log import get_date
+import datetime
+import time_operations as to
+
+def extract_data(date):
+    user = os.getlogin()
+    path = "/home/" + user +"/.cache/Watcher/raw_data/"
+    filename = path + date + ".csv"
+
+    l = list() # l = list of  (app_name, time spent on app on that session)
+    d = dict()
+
+    if os.path.isfile(filename):
+        with open(filename, 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                for column in row:
+                    l.append([column[18::],column[9:17]])
+                    d.update({column[18::]: "O"})
+    else:
+        None
+
+    d = list(d) # list of app opened on that day
+    return d, l
+
+# creating dictionary to store time spend on each applicaitons on that particular day
+def final_report(window_opened, time_spent):
+    report = dict()
+
+    for i in window_opened: # i is applications name
+        time = '00:00:00'
+        for j in time_spent: # j is list of applicaions_name and  time_spent in particular session
+            if i == j[0]:
+                time = to.time_addition(j[1], time)
+                report.update({i:time})
+
+    #print(report)
+    if "User-logged-in" in report.keys():
+        report.pop("User-logged-in")
+    if "AFK" in report.keys():
+        report.pop("AFK")
+    if "Unknown" in report.keys():
+        report.pop("Unknown")
+    # sort report dictonary in decreasing order of Usages
+    sorted_values = []
+    for x,y in report.items():
+        sorted_values.append(to.convert_into_sec(y))
+
+    sorted_values.sort(reverse=True)
+    sorted_report = dict()
+
+    for i in sorted_values:
+        for x, y in report.items():
+            if to.convert_into_sec(y) == i:
+                sorted_report.update({x:y})
+
+    return sorted_report
+
+def export_to_new(date):
+    window_opened, time_spent = extract_data(date)
+    sorted_report = final_report(window_opened, time_spent)
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
+    overwrite_Data = []
+    with open(filename, 'w') as csvfile:
+        for x,y in sorted_report.items():
+            overwrite_Data.append([y,x])
+
+        csvwriter = csv.writer(csvfile, delimiter='\t')
+        csvwriter.writerows(overwrite_Data)
+
+    del sorted_report
+    del overwrite_Data
+
+path = "/home/" + os.getlogin() +"/.cache/Watcher/raw_data/"
+for file in os.listdir(path):
+    export_to_new(file[:-4])
+
+
