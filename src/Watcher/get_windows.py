@@ -1,6 +1,12 @@
 import os
 import time
+import platform
 from afk import get_afk_status
+
+if platform.system() == 'Windows':
+    from win32gui import GetWindowText, GetForegroundWindow
+elif platform.system() == 'Darwin':
+    import subprocess
 
 # get title name of app that user working on
 def active_window_title():
@@ -47,13 +53,3 @@ def previous_window(array_of_window, active_window):
     array_of_window.append(active_window)
     return l[-2]
 
-
-### what to do after window get change I've to append one line in csv data file in following format
-### opened-time      closed-time      time-spent     window_class_name      window_title_name
-
-### and whenever the user puts particular command it will make report till the time for that day and shows that report in terminal
-if __name__ == "__main__":
-    while True:
-        time.sleep(1)
-        print(active_window_title())
-        print(os.popen('''xdotool getwindowfocus getwindowname''').read())
