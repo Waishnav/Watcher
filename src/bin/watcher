@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 import sys
 sys.path.insert(0, "/usr/share/Watcher/")
