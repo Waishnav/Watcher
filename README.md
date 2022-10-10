@@ -9,7 +9,9 @@
 - [About](#about)
 - [Gallery](#gallery)
 - [Installation](#installation)
+- [Contribution](#for-contributing)
 - [Todo](#to-do)
+
 
 ## About
 
@@ -44,6 +46,9 @@ $ cd ./Watcher/
 ```bash
 $ chmod +x ./install && ./install
 ```
+
+### For Contributing
+If you are interseted in contibuting checkout [CONTRIBUTING.md](https://github.com/Waishnav/Watcher/blob/main/CONTRIBUTING.md)
 
 ## To-do
 
