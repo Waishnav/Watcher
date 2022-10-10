@@ -34,6 +34,11 @@ class Color:
     def UNDERLINE(text):
         return '\033[4m' + text + '\033[0m'
 
+def truncate(string, width):
+    if len(string) > width:
+        string = string[:width-3] + '...'
+    return string
+
 def daily_summary(date = get_date()):
     window_opened, time_spent = anls.extract_data(date)
     Total_screen_time = "00:00:00"
@@ -69,6 +74,7 @@ def daily_summary(date = get_date()):
     for x,y in anls.final_report(window_opened, time_spent).items():
         if x == "":
             x = "Home-Screen"
+        x=truncate(x,22)
         print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
 
 def week_summary(week = os.popen('''date +"W%V-%Y"''').read()[:-1]):
