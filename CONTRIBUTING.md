@@ -1,7 +1,7 @@
 
 # How  Watcher works ?
 
-First let's understand how it works .
+First let's understand how it works.
 
 `./install` file install's all the py scripts and make Watcher to run on startup.
 
@@ -13,19 +13,19 @@ First let's understand how it works .
 - **[analysis.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/analysis.py)** : It gives the report  for the week summary and day summary of the usage.
 - **[commands.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/commands.py)** : This is used to display the data that analysis.py has analysed. Additionally, it contains all of the command outputs; in essence, this file is where the user interacts with the Wacther.
 
-- **[get_windows.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/get_windows.py)** : It gives the title/name of the Active Window/App .
+- **[get_windows.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/get_windows.py)** : It gives the title/name of the Active Window/App.
 
-- **[time_operations.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/time_operations.py)** : It converts the raw time data into time how much the app is used . Also format produce the time in [HH:MM:SS](https://docs.oracle.com/cd/E41183_01/DR/Time_Formats.html) format .
+- **[time_operations.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/time_operations.py)** : It converts the raw time data into time how much the app is used. Also format produce the time in [HH:MM:SS](https://docs.oracle.com/cd/E41183_01/DR/Time_Formats.html) format.
 
-- **[watch.log](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/watch_log.py)** : This is where the logs file are created it creates two kind of log files for Week analysis and Day analysis , log files for Day analysis are created in [Date].csv format and for week W[week_no.]_[year].py format.
+- **[watch.log](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/watch_log.py)** : This is where the logs file are created it creates two kind of log files for Week analysis and Day analysis, log files for Day analysis are created in [Date].csv format and for week W[week_no.]_[year].py format.
 
 ----------------------------- ## **v2.0** ## --------------------------
 
-#### Main Difference between [v1.0](https://github.com/Waishnav/Watcher/tree/v1.0/src/Watcher) and [v2.0](https://github.com/Waishnav/Watcher/tree/v2.0/src/Watcher) is the Represntation of the csv and the Algorithm( The way in which it calculate and present the usage time ) is **optimized** .
+#### Main Difference between [v1.0](https://github.com/Waishnav/Watcher/tree/v1.0/src/Watcher) and [v2.0](https://github.com/Waishnav/Watcher/tree/v2.0/src/Watcher) is the Represntation of the csv and the Algorithm( The way in which it calculate and present the usage time ) is **optimized**.
 
-- #### The file which is changed mainly is [analysis.py](https://github.com/Waishnav/Watcher/blob/v2.0/src/Watcher/analysis.py) and the [watch_log.py](https://github.com/Waishnav/Watcher/blob/v2.0/src/Watcher/watch_log.py) .
+- #### The file which is changed mainly is [analysis.py](https://github.com/Waishnav/Watcher/blob/v2.0/src/Watcher/analysis.py) and the [watch_log.py](https://github.com/Waishnav/Watcher/blob/v2.0/src/Watcher/watch_log.py).
 
-#### In v1.0 their is multiple session of time created even for the same window/apps but in v2.0 this is optimized and been removed the multiple session for each apps .
+#### In v1.0 their is multiple session of time created even for the same window/apps but in v2.0 this is optimized and been removed the multiple session for each apps.
 ## Screenshots (csv files)
 v1.0            |      v2.0
 :-------------------------:|:-------------------------:
@@ -89,4 +89,4 @@ If you have any questions, you can:
  - (as a last resort/if needed) Email one of the maintainers at: [waishnavdeore@gmail.com](mailto:waishnavdeore@gmail.com)
 
 
-[github discussions]: https://github.com/Waishnav/Watcher/discussions
+[github discussions]: https://github.com/Waishnav/Watcher/discussions.
