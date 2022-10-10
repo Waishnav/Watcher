@@ -1,12 +1,13 @@
 
-# How  Watcher works ?
+-----------------------
+How Watcher works exactly ?
+=================
 
 First let's understand how it works.
 
 `./install` file install's all the py scripts and make Watcher to run on startup.
 
-
---------------------------- ## **v1.0** ## ----------------------------
+### **v1.0**
 
 - **[afk.py](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/afk.py)** : As name sugested it records the time for being afk it will count afk time when no input is given within 1 min . Also it ignores if their is video playback.
 
@@ -19,9 +20,10 @@ First let's understand how it works.
 
 - **[watch.log](https://github.com/Waishnav/Watcher/blob/v1.0/src/Watcher/watch_log.py)** : This is where the logs file are created it creates two kind of log files for Week analysis and Day analysis, log files for Day analysis are created in [Date].csv format and for week W[week_no.]_[year].py format.
 
------------------------------ ## **v2.0** ## --------------------------
 
-#### Main Difference between [v1.0](https://github.com/Waishnav/Watcher/tree/v1.0/src/Watcher) and [v2.0](https://github.com/Waishnav/Watcher/tree/v2.0/src/Watcher) is the Represntation of the csv and the Algorithm( The way in which it calculate and present the usage time ) is **optimized**.
+### **v2.0** 
+
+#### Main Difference between [v1.0](https://github.com/Waishnav/Watcher/tree/v1.0/src/Watcher) and [v2.0](https://github.com/Waishnav/Watcher/tree/v2.0/src/Watcher) is the Represntation of the csv and the Algorithm (The way in which it calculate and present the usage time) is **optimized**.
 
 - #### The file which is changed mainly is [analysis.py](https://github.com/Waishnav/Watcher/blob/v2.0/src/Watcher/analysis.py) and the [watch_log.py](https://github.com/Waishnav/Watcher/blob/v2.0/src/Watcher/watch_log.py).
 
@@ -32,23 +34,30 @@ v1.0            |      v2.0
 ![](https://user-images.githubusercontent.com/83799380/194891764-f45c529c-d29d-4d14-96fc-bce0e80becb5.png)  |  ![](https://user-images.githubusercontent.com/83799380/194891867-a49df66a-5ae0-4b9b-9aa7-b6d6681c4574.png)
 
 -----------------------
-How to Contribute
+How can you Contribute to this cool project ?
 =================
 
-**Table of Contents**
+### Table of Contents
 
  - [Getting started](https://github.com/Waishnav/Watcher)
+ - [Work on Landing page](https://github.com/Waishnav/Watcher/tree/watcher-website)
+      - Landing website which helps people to gain clearity about thier screen-time and its importance.
+      - It is made with the help of React-framework
+ - [Solve v1.0 issues](https://github.com/Waishnav/Watcher/tree/v1.0)
+      - There are some bugs in the v1.0 some of them are small some might be big. so you can solve them and improve v1.0.
+ - [Improve v2.0](https://github.com/Waishnav/Watcher/tree/v2.0)
+      - v2.0 is improvised version of previous algorithm test it and give us feedback in discussion section.
  - [How you can help](#how-you-can-help)
  - [Questions?](#questions)
 
 
-## How you can help
+### How you can help
 
 There are many ways to contribute to Watcher:
 
- - Work on issues labeled [`good first issue`][good first issue] or [`help wanted`][help wanted], these are especially suited for new contributors.
- - Fix [`bugs`][bugs].
- - Implement new features.
+ - Work on issues labeled [`good first issue`] or [`help wanted`][help wanted], these are especially suited for new contributors.
+ - Fix [`bugs`].
+ - Implement new features. NOTE: before implementing and doing PR do discuss with the community with opening issue.
    - Look among the [requested features][requested features] on the forum.
    
  - Write documentation.
@@ -85,8 +94,8 @@ Examples:
 
 If you have any questions, you can:
 
- - Post on [the forum][forum] or [GitHub Discussions][github discussions].
- - (as a last resort/if needed) Email one of the maintainers at: [waishnavdeore@gmail.com](mailto:waishnavdeore@gmail.com)
+ - Create new discussion revolve around your question. [GitHub Discussions](https://github.com/Waishnav/Watcher/discussions).
+ - (as a last resort/if needed) Email me (Maintainer): [waishnavdeore@gmail.com](mailto:waishnavdeore@gmail.com)
 
 
 [github discussions]: https://github.com/Waishnav/Watcher/discussions.
