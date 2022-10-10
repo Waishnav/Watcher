@@ -20,6 +20,7 @@ Day Summary             |  Week Summary
 Funfact: You might be thinking how can someone has 14 hrs of screen time in a single day, Well ! short ans is AFK-feature is not implemented yet... Most of the time I left my laptop as it is so it also counts that AFK time as Screen-time
 
 ## Installation
+* Note: Install [```Python```](https://www.python.org/downloads/) ensure you have the latest stable release for your system (64-bit/32-bit)
 * Note: Install [```xprintidle```](https://github.com/g0hl1n/xprintidle) and [```xdotool```](https://github.com/jordansissel/xdotool) on your system ( its the only dependancy )
 * First, Install the following dependancy ```xprintidle``` and ```xdotool```
 ```bash
