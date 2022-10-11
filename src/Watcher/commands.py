@@ -115,6 +115,7 @@ def week_summary(week = os.popen('''date +"W%V-%Y"''').read()[:-1]):
     for x,y in app_usages.items():
         if x == "":
             x = "Home-Screen"
+        y/=2
         print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
 
 #testing
