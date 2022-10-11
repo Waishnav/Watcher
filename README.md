@@ -9,7 +9,7 @@
 - [About](#about)
 - [Gallery](#gallery)
 - [Installation](#installation)
-- [Contribution](#for-contributing)
+- [Want to Contribute](#want-to-contribute)
 - [Todo](#to-do)
 
 
@@ -47,8 +47,15 @@ $ cd ./Watcher/
 $ chmod +x ./install && ./install
 ```
 
-### For Contributing
+### Want to Contribute
 If you are interseted in contibuting checkout [CONTRIBUTING.md](https://github.com/Waishnav/Watcher/blob/main/CONTRIBUTING.md)
+
+You can currently contribute to one of the three projects listed below throughout the HACTOBERFEST. 
+- [Watcher Website](https://github.com/Waishnav/Watcher/tree/watcher-website) (made with React)
+- [Watcher v1.0](https://github.com/Waishnav/Watcher/tree/v1.0) (No real time updates in logfile)
+- [Watcher v2.0](https://github.com/Waishnav/Watcher/tree/v2.0) (Real time stats in logfile)
+
+To contribute, clone the relevant branch anywhere you wish to. 
 
 ## To-do
 
