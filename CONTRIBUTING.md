@@ -40,7 +40,7 @@ How can you Contribute to this cool project ?
 ### Table of Contents
 
  - [Getting started](https://github.com/Waishnav/Watcher)
- - [Work on Landing page](https://github.com/Waishnav/Watcher/tree/watcher-website)
+ - [Work on Landing page](https://github.com/Waishnav/Watcher-web)
       - Landing website which helps people to gain clearity about thier screen-time and its importance.
       - It is made with the help of React-framework
  - [Solve v1.0 issues](https://github.com/Waishnav/Watcher/tree/v1.0)

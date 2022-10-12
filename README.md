@@ -51,7 +51,7 @@ $ chmod +x ./install && ./install
 If you are interseted in contibuting checkout [CONTRIBUTING.md](https://github.com/Waishnav/Watcher/blob/main/CONTRIBUTING.md)
 
 You can currently contribute to one of the three projects listed below throughout the HACTOBERFEST. 
-- [Watcher Website](https://github.com/Waishnav/Watcher/tree/watcher-website) (made with React)
+- [Watcher Website](https://github.com/Waishnav/Watcher-web) (made with React)
 - [Watcher v1.0](https://github.com/Waishnav/Watcher/tree/v1.0) (No real time updates in logfile)
 - [Watcher v2.0](https://github.com/Waishnav/Watcher/tree/v2.0) (Real time stats in logfile)
 
