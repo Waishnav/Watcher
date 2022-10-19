@@ -18,7 +18,7 @@ def get_date():
 
 def update_csv(date, Data):
     user = os.getlogin()
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+date+".csv"
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
     overwrite_Data = []
     
     with open(filename, 'w') as csvfile:
@@ -32,10 +32,10 @@ def update_csv(date, Data):
 # also if usr is AFK then append line
 def import_data(file):
     with open(file, 'r') as f:
-         raw_data = f.readlines()
+         daily_data = f.readlines()
     data = dict()
     #l = []
-    for x in raw_data:
+    for x in daily_data:
         x = x.split('\t')
         a = {x[1][:-1]:x[0]}
         #l.append(x[1][:-1])
@@ -46,7 +46,7 @@ def import_data(file):
 # TODO: AFK feature devlopement (it will be developed after completing alpha product (after whole project up end running)
 
 def log_creation():
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
     if not(os.path.isfile(filename)):
         os.popen("touch " + filename)
 
@@ -56,7 +56,7 @@ def log_creation():
     while True:
         date = get_date()
         
-        filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+        filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
         rowcount  = 0                
         for row in open(filename):
             rowcount+= 1
@@ -78,11 +78,11 @@ def log_creation():
             usage = time_addition("00:00:01", usage)
             app_data.update({active_window : usage})
                          
-            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"):
+            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"):
                 update_csv(get_date(), app_data)
     
-            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv")):
-                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
                 with open(new_filename, 'w') as fp:
                     pass
 
@@ -90,8 +90,8 @@ def log_creation():
                 #app_data = {}
         
         else :
-            if not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv")):
-                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+            if not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
                 with open(new_filename, 'w') as fp:
                     pass
 
