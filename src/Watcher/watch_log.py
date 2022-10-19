@@ -4,6 +4,7 @@ import time
 import get_windows as x
 import afk as y
 from time_operations import time_difference, time_addition, convert
+import pandas as pd
 
 # get current time whenever the function is called
 def get_time():
@@ -19,6 +20,7 @@ def update_csv(date, Data):
     user = os.getlogin()
     filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
     overwrite_Data = []
+    
     with open(filename, 'w') as csvfile:
         for x,y in Data.items():
             overwrite_Data.append([y,x])
@@ -30,10 +32,10 @@ def update_csv(date, Data):
 # also if usr is AFK then append line
 def import_data(file):
     with open(file, 'r') as f:
-         raw_data = f.readlines()
+         daily_data = f.readlines()
     data = dict()
     #l = []
-    for x in raw_data:
+    for x in daily_data:
         x = x.split('\t')
         a = {x[1][:-1]:x[0]}
         #l.append(x[1][:-1])
@@ -50,15 +52,21 @@ def log_creation():
 
     afk = False
     afkTimeout = 1 # timeout in minutes
-    data = import_data(filename)
+    app_data = import_data(filename)
     while True:
         date = get_date()
-        filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
-        afk = y.is_afk(afkTimeout)
+        
+        filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+        rowcount  = 0                
+        for row in open(filename):
+            rowcount+= 1
+                
+        print("Number of lines present:-", get_date(), rowcount)
 
+        afk = y.is_afk(afkTimeout)
         if not(afk):
             active_window = x.active_window()
-            usage = data.get(active_window)
+            usage = app_data.get(active_window) 
             if usage == None:
                 usage = "00:00:00"
 
@@ -68,15 +76,34 @@ def log_creation():
                 usage = time_difference(convert(afk_time), usage)
 
             usage = time_addition("00:00:01", usage)
-            data.update({active_window : usage})
-            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"):
-                update_csv(get_date(), data)
-            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv")):
-                os.popen("touch " + "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv")
-                data.clear()
+            app_data.update({active_window : usage})
+                         
+            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"):
+                update_csv(get_date(), app_data)
+    
+            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+                with open(new_filename, 'w') as fp:
+                    pass
 
-if __name__ == "__main__":
+                app_data.clear()                
+                #app_data = {}
+        
+        else :
+            if not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+                with open(new_filename, 'w') as fp:
+                    pass
+
+                app_data.clear()                
+                #app_data = {}
+        
+           
+    
+
+if __name__ == "__main__":            
     log_creation()
+    
     #afk_time = int(round(int(os.popen("xprintidle").read()[:-1])/1000, 0))
     #print(afk_time)
 
