@@ -46,7 +46,9 @@ def import_data(file):
 def log_creation():
     filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
     if not(os.path.isfile(filename)):
-        os.popen("touch " + filename)
+        creat_file = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+        with open(creat_file, 'w') as fp:
+            pass
 
     afk = False
     afkTimeout = 1 # timeout in minutes
@@ -69,11 +71,15 @@ def log_creation():
 
             usage = time_addition("00:00:01", usage)
             data.update({active_window : usage})
-            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"):
+            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"):
                 update_csv(get_date(), data)
-            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv")):
-                os.popen("touch " + "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv")
+            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+                with open(new_filename, 'w') as fp:
+                    pass
+
                 data.clear()
+        
 
 if __name__ == "__main__":
     log_creation()
