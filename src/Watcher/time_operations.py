@@ -66,4 +66,17 @@ def convert_into_sec(t):
     sec = int(t[0:2])*3600 + int(t[3:5])*60 + int(t[6::])
     return sec
 
+def convert(sec):
+    sec = int(sec)
+    sec = sec % (24 * 3600)
+    hr = sec // 3600
+    sec %= 3600
+    mn = sec // 60
+    sec %= 60
+    hr = str(hr).zfill(2)
+    mn = str(mn).zfill(2)
+    sec = str(sec).zfill(2)
+
+    result = hr + ":" + mn + ":" + sec
+    return result
 

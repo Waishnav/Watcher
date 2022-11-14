@@ -3,7 +3,7 @@ import csv
 import time
 import get_windows as x
 import afk as y
-from time_operations import time_difference
+from time_operations import time_difference, time_addition, convert
 
 # get current time whenever the function is called
 def get_time():
@@ -15,59 +15,74 @@ def get_date():
     d = os.popen('''date +"%Y-%m-%d"''').read()
     return d[0:-1]
 
-def append_line_in_csv(date, opened_time, closed_time, window_name):
-    user = os.getlogin()
-    time_spent = time_difference(opened_time, closed_time)
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+date+".csv"
-    Data = [closed_time, time_spent,  window_name]
-    with open(filename, 'a') as csvfile:
+def update_csv(date, Data):
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
+    overwrite_Data = []
+    with open(filename, 'w') as csvfile:
+        for x,y in Data.items():
+            overwrite_Data.append([y,x])
+
         csvwriter = csv.writer(csvfile, delimiter='\t')
-        csvwriter.writerow(Data)
+        csvwriter.writerows(overwrite_Data)
 
 # Expected Behaviour == if date got changed then append line in new csv file after initializing the csv file
 # also if usr is AFK then append line
+def import_data(file):
+    with open(file, 'r') as f:
+         raw_data = f.readlines()
+    data = dict()
+    #l = []
+    for x in raw_data:
+        x = x.split('\t')
+        a = {x[1][:-1]:x[0]}
+        #l.append(x[1][:-1])
+        data.update(a)
+    return data
+
 
 # TODO: AFK feature devlopement (it will be developed after completing alpha product (after whole project up end running)
 
 def log_creation():
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
+    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
     if not(os.path.isfile(filename)):
-        with open(filename, 'a') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter='\t')
-            csvwriter.writerow([get_time(), "00:00:00", ""])
-    logout_time = os.popen("tail -n1 " + filename).read().split("\t")[0]
-    append_line_in_csv(get_date(), logout_time, get_time(), "User-logged-in")
+        creat_file = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+        with open(creat_file, 'w') as fp:
+            pass
 
     afk = False
-    afkTimeout = 3 # timeout in minutes
-
+    afkTimeout = 1 # timeout in minutes
+    data = import_data(filename)
     while True:
-        opened_at = get_time()
-        previous_window = x.active_window()
+        date = get_date()
+        filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
+        afk = y.is_afk(afkTimeout)
+        print(data)
 
-        if (y.returned_from_afk(afk, afkTimeout)):
-            previous_window = "AFK"
-            if os.path.exists(filename):
-                opened_at = os.popen(" tail -n1 "+ filename).read().split("\t")[0]
-            else:
-                previous_date = os.popen("""date -d "1 day ago" '+%Y-%m-%d'""").read()[:-1]
-                opened_at = os.popen(" tail -n1 ~/.cache/Watcher/raw_data/"+previous_date+".csv").read().split("\t")[0]
-            afk = False
+        if not(afk):
+            active_window = x.active_window()
+            usage = data.get(active_window)
+            if usage == None:
+                usage = "00:00:00"
 
-        if (x.is_window_changed(previous_window, afk, afkTimeout) and not afk):
-            if(y.is_afk(afkTimeout)):
-                afk = True
-                # minimizing error
-                closed_at = time_difference("00:02:58", get_time())
-            else:
-                closed_at = get_time() # for next_window its the opening time
+            time.sleep(1)
+            if y.is_afk(afkTimeout):
+                afk_time = int(round(int(os.popen("xprintidle").read()[:-1])/1000, 0))
+                usage = time_difference(convert(afk_time), usage)
 
-            date = get_date()
-            filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+date+".csv"
-            append_line_in_csv(date, opened_at, closed_at, previous_window)
+            usage = time_addition("00:00:01", usage)
+            data.update({active_window : usage})
+            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"):
+                update_csv(get_date(), data)
+            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+                with open(new_filename, 'w') as fp:
+                    pass
+
+                data.clear()
+        
 
 if __name__ == "__main__":
-    #log_creation()
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/raw_data/"+get_date()+".csv"
-    opened_at = os.popen(" tail -n1 "+ filename).read().split("\t")[0]
-    print(opened_at)
+    log_creation()
+    #afk_time = int(round(int(os.popen("xprintidle").read()[:-1])/1000, 0))
+    #print(afk_time)
+

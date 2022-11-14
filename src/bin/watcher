@@ -46,7 +46,7 @@ if len(arg) == 2:
         print("Log creations started... \nif you wanna stop it, use keyboard-shortcut (Ctrl+Shift+C or Ctrl+C)")
         x.log_creation()
     elif arg[1] == "--version" or arg[1] == "-v":
-        print("Version: 1.3.1")
+        print("Version: 2.0.0")
     else:
         wrong_option()
 

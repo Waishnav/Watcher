@@ -1,4 +1,5 @@
 #!/bin/bash
+git clone https://github.com/Waishnav/Watcher -b v2.0 && cd Watcher && ./install
 
 echo "[✔] First of all Thanks for dropping by!."
 sleep 1s
@@ -18,7 +19,7 @@ echo "[✔] Making it executable by giving it permission"
 # making directory for log-files (where all you daily logs are stored)
 mkdir -p ~/.cache/Watcher/
 echo "[✔] To store raw_data making directory as ~/.cache/Watcher"
-mkdir -p ~/.cache/Watcher/raw_data/
+mkdir -p ~/.cache/Watcher/daily_data/
 mkdir -p ~/.cache/Watcher/Analysis/
 
 # deleting folowing lines "[ -f /etc/xprofile ] && . /etc/xprofile/" and "[ -f ~/.xprofile ] && . ~/.xprofile"
