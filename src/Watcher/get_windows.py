@@ -1,12 +1,4 @@
 import os
-import time
-import platform
-from afk import get_afk_status
-
-if platform.system() == 'Windows':
-    from win32gui import GetWindowText, GetForegroundWindow
-elif platform.system() == 'Darwin':
-    import subprocess
 
 # get title name of app that user working on
 def active_window_title():
@@ -51,5 +43,7 @@ def active_window():
 def previous_window(array_of_window, active_window):
     array_of_window.remove(active_window)
     array_of_window.append(active_window)
-    return l[-2]
+    return array_of_window[-2]
 
+if __name__ == "__main__":
+    print(active_window())

@@ -16,7 +16,6 @@ def get_date():
     return d[0:-1]
 
 def update_csv(date, Data):
-    user = os.getlogin()
     filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
     overwrite_Data = []
     with open(filename, 'w') as csvfile:
@@ -57,6 +56,7 @@ def log_creation():
         date = get_date()
         filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
         afk = y.is_afk(afkTimeout)
+        print(data)
 
         if not(afk):
             active_window = x.active_window()
