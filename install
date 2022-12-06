@@ -1,5 +1,5 @@
 #!/bin/bash
-git clone https://github.com/Waishnav/Watcher -b v2.0 && cd Watcher && ./install
+git clone https://github.com/Waishnav/Watcher -b v2.0 && cd Watcher
 
 echo "[✔] First of all Thanks for dropping by!."
 sleep 1s
