@@ -1,7 +1,0 @@
-#!/bin/bash
-sudo rm -rf /usr/share/Watcher/*
-sudo cp -r ./src/Watcher/* /usr/share/Watcher/
-
-sudo cp -r ./src/bin/watcher /usr/local/bin/
-sudo chmod +x /usr/local/bin/watcher
-echo "[✔] Updating Finished."

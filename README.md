@@ -1,63 +1,70 @@
-# Watcher
+# Getting Started with Create React App
 
-### Minimal Open source Screen-Time Tracker (CLI-app)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-<img src="https://cdn.discordapp.com/attachments/846673042893832195/952274599276580874/watcher.png" width=90% height=auto>
+## Available Scripts
 
-## Table of Contents
+In the project directory, you can run:
 
-- [About](#about)
-- [Gallery](#gallery)
-- [Installation](#installation)
-- [Want to Contribute](#want-to-contribute)
-- [Todo](#to-do)
+### `npm start`
 
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## About
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-Watcher is CLI-app (at this moment) which helps you to get perspective about your Screen-time
+### `npm test`
 
-## Gallery
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-|                                          Day Summary                                          |                                         Week Summary                                          |
-| :-------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: |
-| ![](https://cdn.discordapp.com/attachments/846673042893832195/952283314746691624/unknown.png) | ![](https://cdn.discordapp.com/attachments/846673042893832195/952283190716948521/unknown.png) |
+### `npm run build`
 
-Funfact: You might be thinking how can someone has 14 hrs of screen time in a single day, Well ! short ans is AFK-feature is not implemented yet... Most of the time I left my laptop as it is so it also counts that AFK time as Screen-time
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## Installation
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-- Note: Install [`xprintidle`](https://github.com/g0hl1n/xprintidle) and [`xdotool`](https://github.com/jordansissel/xdotool) on your system ( the only dependancies other than python3 ). Install [`python3`](https://www.python.org/downloads/) if not installed in your machine.
-- First, Install the following dependancy `xprintidle` and `xdotool`
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-```bash
-$ sudo [package-manager] install xprintidle xdotool
-```
+### `npm run eject`
 
-- Second, Clone this repository and cd into it-
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-```bash
-$ git clone https://github.com/Waishnav/Watcher
-$ cd ./Watcher/
-```
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-- Then run install script
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-```bash
-$ chmod +x ./install && ./install
-```
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-### Want to Contribute
-If you are interseted in contibuting checkout [CONTRIBUTING.md](https://github.com/Waishnav/Watcher/blob/main/CONTRIBUTING.md)
+## Learn More
 
-You can currently contribute to one of the three projects listed below throughout the HACTOBERFEST. 
-- [Watcher Website](https://github.com/Waishnav/Watcher-web) (made with React)
-- [Watcher v1.0](https://github.com/Waishnav/Watcher/tree/v1.0) (No real time updates in logfile)
-- [Watcher v2.0](https://github.com/Waishnav/Watcher/tree/v2.0) (Real time stats in logfile)
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To contribute, clone the relevant branch anywhere you wish to. 
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-## To-do
+### Code Splitting
 
-- [x] AFK feature
-- [ ] GUI only if got 300 stars Probably [Tauri App](https://github.com/tauri-apps/tauri).
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
