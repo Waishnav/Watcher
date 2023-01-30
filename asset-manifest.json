@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/Watcher/static/css/main.787dcd65.css",
-    "main.js": "/Watcher/static/js/main.ee1569e3.js",
-    "static/media/bg-grid.png": "/Watcher/static/media/bg-grid.d1db64c407ab22c16d05.png",
-    "static/media/app-usage.svg": "/Watcher/static/media/app-usage.f0793eab9f9f8489067083f64475fa8d.svg",
-    "static/media/grainy-effect.png": "/Watcher/static/media/grainy-effect.508f8278548637ad0c52.png",
-    "static/media/detailed-analysis.svg": "/Watcher/static/media/detailed-analysis.b3cb02d8d3ac619ee25a42c3b19c2c68.svg",
-    "static/media/less-resources.svg": "/Watcher/static/media/less-resources.88123b7900f7f4e58d0f7399f1f30b26.svg",
-    "static/media/logo.svg": "/Watcher/static/media/logo.138c0c4ee47e8d4eef9ac0b2f07db10c.svg",
-    "static/media/screen-glow.svg": "/Watcher/static/media/screen-glow.34f49988d47fe58ac66bc247f73837dc.svg",
-    "static/media/github.svg": "/Watcher/static/media/github.eb001af7cde44cddbdc31ae78a38e5d3.svg",
-    "index.html": "/Watcher/index.html",
-    "static/media/arrow.svg": "/Watcher/static/media/arrow.cc4678b2ef195cdf92b18988c9b1695e.svg",
-    "static/media/up-arrow.svg": "/Watcher/static/media/up-arrow.d6924f867fd1916ad6153f76ef445d61.svg",
-    "static/media/accordion-arrow.svg": "/Watcher/static/media/accordion-arrow.9df096de737928d5512fe30565efd737.svg",
-    "main.787dcd65.css.map": "/Watcher/static/css/main.787dcd65.css.map",
-    "main.ee1569e3.js.map": "/Watcher/static/js/main.ee1569e3.js.map"
+    "main.css": "/static/css/main.904166b4.css",
+    "main.js": "/static/js/main.6178a726.js",
+    "static/media/bg-grid.png": "/static/media/bg-grid.d1db64c407ab22c16d05.png",
+    "static/media/app-usage.svg": "/static/media/app-usage.f0793eab9f9f8489067083f64475fa8d.svg",
+    "static/media/grainy-effect.png": "/static/media/grainy-effect.508f8278548637ad0c52.png",
+    "static/media/detailed-analysis.svg": "/static/media/detailed-analysis.b3cb02d8d3ac619ee25a42c3b19c2c68.svg",
+    "static/media/less-resources.svg": "/static/media/less-resources.88123b7900f7f4e58d0f7399f1f30b26.svg",
+    "static/media/logo.svg": "/static/media/logo.138c0c4ee47e8d4eef9ac0b2f07db10c.svg",
+    "static/media/screen-glow.svg": "/static/media/screen-glow.34f49988d47fe58ac66bc247f73837dc.svg",
+    "static/media/github.svg": "/static/media/github.eb001af7cde44cddbdc31ae78a38e5d3.svg",
+    "index.html": "/index.html",
+    "static/media/arrow.svg": "/static/media/arrow.cc4678b2ef195cdf92b18988c9b1695e.svg",
+    "static/media/up-arrow.svg": "/static/media/up-arrow.d6924f867fd1916ad6153f76ef445d61.svg",
+    "static/media/accordion-arrow.svg": "/static/media/accordion-arrow.9df096de737928d5512fe30565efd737.svg",
+    "main.904166b4.css.map": "/static/css/main.904166b4.css.map",
+    "main.6178a726.js.map": "/static/js/main.6178a726.js.map"
   },
   "entrypoints": [
-    "static/css/main.787dcd65.css",
-    "static/js/main.ee1569e3.js"
+    "static/css/main.904166b4.css",
+    "static/js/main.6178a726.js"
   ]
 }
