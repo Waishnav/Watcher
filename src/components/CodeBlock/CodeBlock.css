@@ -1,0 +1,35 @@
+.code {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.8rem;
+  background-color: #292929;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  border-radius: 8px;
+  font-family: "JetBrains Mono", monospace;
+  gap: 20px;
+  align-items:center;
+}
+
+
+.code button {
+  cursor: pointer;
+  color: white;
+  height: 40px;
+  width: 40px;
+  background-color: gray;
+  border: none;
+  border-radius: 4px;
+}
+
+.code pre {
+  margin: 0px;
+  padding: 0px;
+}
+
+.code pre code {
+  display: flex;
+  width: 800px;
+  flex-wrap: wrap;
+
+}

@@ -1,0 +1,68 @@
+.back-arrow {
+  transform: rotate(180deg);
+}
+
+.installation-section {
+  display: flex;
+  padding: 5rem 8rem;
+  align-items: center;
+  height: 25rem;
+  margin: auto;
+  width: 50%;
+  max-width: 900px;
+}
+.installation-section *:not(.glowy-screen) {
+  z-index: 20;
+}
+
+.installation-section .text {
+  margin-top: 40px;
+}
+
+.glowy-screen {
+  z-index: -100;
+  position: relative;
+  transform: translateY(58px);
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+.text h3 {
+  font-weight: 500;
+  font-size: 20px;
+  margin: 0rem;
+}
+
+.text h1 {
+  font-weight: 700;
+  font-size: 32px;
+  margin: 0rem;
+}
+
+.text li {
+  color: #9F9F9F;
+  font-weight: 400;
+  font-size: 20px;
+  width: 559px;
+  margin-bottom: 3rem;
+}
+.text li {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.text li ul {
+  padding-left: 20px;
+}
+
+
+.primary-btn:hover .back-arrow {
+  right: 10px;
+}
+
+.back-arrow {
+  position: relative;
+  right: 2px;
+  transition: 0.5s;
+}

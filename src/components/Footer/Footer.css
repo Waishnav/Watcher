@@ -1,0 +1,77 @@
+footer * {
+  text-decoration: none;
+  color: white;
+}
+
+footer {
+  margin: auto;
+  width: 80%;
+  max-width: 1400px;
+  padding: 1rem;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.contribution h1 {
+  font-weight: 600;
+  font-size: 32px;
+  text-decoration-line: underline;
+  text-transform: uppercase;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), -1px 4px 19px rgba(255, 230, 0, 0.4);
+  margin: 0px;
+  margin-bottom: 3rem;
+}
+
+.footer-branding {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+.footer-container .branding .text {
+  text-shadow: 2px 2px 0px #A431FF;
+}
+
+.github-section {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+.github-section .github {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 36px;
+  text-decoration-line: underline;
+  color: #FFFFFF;
+}
+
+.github-section .repo {
+  font-weight: 500;
+  font-size: 20px;
+  background: linear-gradient(92.02deg, #31FF90 9.57%, rgba(49, 255, 144, 0.17) 140.33%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.up-arrow {
+  position: relative;
+  top: -15px
+}
+
+.contributors img {
+  height: 50px;
+  border-radius: 10%;
+}
+
+.contributors {
+  display: flex;
+  gap: 10px;
+}
