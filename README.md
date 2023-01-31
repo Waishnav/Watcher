@@ -1,70 +1,101 @@
-# Getting Started with Create React App
+## Watcher website first look
+This is what we are gonna make throughout the Hacktoberfest.
+Also do check out [Watcher](https://github.com/waishnav/watcher)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<!-- ![web-page-landing](https://user-images.githubusercontent.com/86405648/215854855-19945b6e-1255-4611-a7bf-2cab00b59ebb.png) -->
 
-## Available Scripts
+<img src="https://user-images.githubusercontent.com/86405648/215854855-19945b6e-1255-4611-a7bf-2cab00b59ebb.png" width=90% height=auto>
 
-In the project directory, you can run:
+## Tech-stack
+![ReactJS](https://img.shields.io/badge/-React-orange?color=282c34&style=for-the-badge&logo=React&logoColor=#282c34&logoWidth=20)
+![CSS3](https://img.shields.io/badge/-CSS3-orange?color=264DE4&style=for-the-badge&logo=CSS3&logoColor=white&logoWidth=20)
 
-### `npm start`
+## Want to Contribute to Watcher ?
+## Rules
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Before starting to work on any issue make sure it's assigned to you
 
-### `npm test`
+- Add the Issue you worked on in your Pull Request 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Don't work on the main branch, create your own branch 
 
-### `npm run build`
+## 💥 How to Contribute
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Take a look at the existing [Issues](https://github.com/Waishnav/Watcher/issues) or [create a new issue](https://github.com/Waishnav/Watcher/issues/new)!
+- [Fork the Repo](https://github.com/Waishnav/Watcher/fork). Then, create a branch for any issue that you are working on. Finally, commit your work.
+- Create a [Pull Request](PR), which will be promptly reviewed and given suggestions for improvements by maintainers
+- Add screenshots or screen captures to your Pull Request to help us understand the effects of the changes proposed in your PR.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🌟 HOW TO MAKE A PULL REQUEST:
 
-### `npm run eject`
+1. Start by making a Fork of the [Watcher](https://github.com/Waishnav/Watcher/fork) repository.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. Clone your new fork of the repository in the terminal/CLI on your computer with the following command:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+git clone https://github.com/<your-github-username>/Watcher -b website
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Navigate to the newly created Code-Magic project directory:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+cd Watcher
+```
 
-## Learn More
+4. Set upstream command:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+git remote add upstream https://github.com/Waishnav/Watcher.git
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+5. Create a new branch:
 
-### Code Splitting
+```bash
+git checkout -b YourBranchName
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+6. Sync your fork or your local repository with the origin repository:
 
-### Analyzing the Bundle Size
+- In your forked repository, click on "Fetch upstream"
+- Click "Fetch and merge"
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Alternatively, Git CLI way to Sync forked repository with origin repository:
 
-### Making a Progressive Web App
+```bash
+git fetch upstream
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+git merge upstream/main
+```
 
-### Advanced Configuration
+### [Github Docs](https://docs.github.com/en/github/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-on-github) for Syncing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+7. Make your changes to the source code.
 
-### Deployment
+8. Stage your changes and commit:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+git add 
+git commit -m "commitmessage"
+```
 
-### `npm run build` fails to minify
+9. Push your local commits to the remote repository:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+git push origin YourBranchName
+```
+
+10. Create a [Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request)!
+
+11. Congratulations! You've made your first contribution to [Watcher](https://github.com/Waishnav/Watcher/graphs/contributors)!
+
+
+## 💥 Issues
+
+In order to discuss changes, you are welcome to [open an issue](https://github.com/Waishnav/Watcher/issues/new) about what you would like to contribute. Enhancements are always encouraged and appreciated.
+
