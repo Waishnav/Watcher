@@ -46,8 +46,23 @@ $ bash <(curl -s https://raw.githubusercontent.com/Waishnav/Watcher/main/install
 $ chmod +x ./install && ./install
 ```
 
+### Display your screen time of the day in a terminal with automatic refresh
+
+On gnome:
+
+`gnome-terminal -- watch cat "/home/$(whoami)/.cache/Watcher/daily_data/$(date +%Y-%m-%d).csv"`
+
+On KDE:
+
+`konsole -e watch cat "/home/$(whoami)/.cache/Watcher/daily_data/$(date +%Y-%m-%d).csv"`
+
+On any other terminal, reuse the command `watch cat "/home/$(whoami)/.cache/Watcher/daily_data/$(date +%Y-%m-%d).csv"`
+
+This will assume that watcher is already started.
+You can add this script to your system's autostart config to have it open on login.
+
 ### Want to Contribute
-If you are interseted in contibuting checkout [CONTRIBUTING.md](https://github.com/Waishnav/Watcher/blob/main/CONTRIBUTING.md)
+If you are interested in contibuting checkout [CONTRIBUTING.md](https://github.com/Waishnav/Watcher/blob/main/CONTRIBUTING.md)
 
 You can currently contribute to one of the three projects listed below throughout the HACTOBERFEST. 
 - [Watcher Website](https://github.com/Waishnav/Watcher-web) (made with React)
