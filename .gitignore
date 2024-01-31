@@ -1,1 +1,2 @@
-src/Watcher/__pycache__/*
+data
+.env
