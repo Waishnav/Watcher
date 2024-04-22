@@ -5,7 +5,7 @@ Copyright © 2024 Waishnav <waishnav.work@gmail.com>
 package cmd
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -20,18 +20,10 @@ It provides summaries for daily and weekly usage.`,
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
-func Init() {
-	rootCmd.AddCommand(versionCmd)
-}
-
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version number of Watcher",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Watcher v2.0")
-	},
+func init() {
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
