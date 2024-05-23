@@ -67,7 +67,7 @@ func (d *DB) InsertOrUpdateAppUsage(appName string, date string, usage time.Dura
 
 // TODO: not used this interface as of now cause currently no plans to implement this for macos until I got one macos machine
 type Display interface {
-	GetActiveWindow() (*string, error)
+  IsActiveWindowChange() (bool, error)
 }
 
 type XDisplay struct {
