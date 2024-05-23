@@ -1,148 +1,104 @@
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
-	"runtime"
 	"strings"
 	"time"
 
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xproto"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
 )
 
-var watchCommand = &cobra.Command{
-	Use:   "watch",
-	Short: "It starts the watching your screen and takes the logs of your usage",
-	Run: func(cmd *cobra.Command, args []string) {
-		// logic to start taking logs and just printing the current app usages as time passes no string in db or logfiles
-
-		// TODO: currently this logic is written in synchronous way, we need to convert this to go routines
-		// implementation with GoRoutines will something like this, first to watch over the change in the current active window and other to check the AFK status of user every status
-		defer closeXConnection()
-
-		err := initXConnection()
-		if err != nil {
-			fmt.Println("Error initializing X connection:", err)
-			return
-		}
-
-		startTime := time.Now()
-		activeWindow, err := ActiveWindow()
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		for {
-			newWindow, err := ActiveWindow()
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-
-			// Sleep for 200ms
-			time.Sleep(200 * time.Millisecond)
-
-			if newWindow.WindowName != activeWindow.WindowName {
-				activeWindow.Usage = time.Since(startTime)
-				fmt.Println(*activeWindow)
-				activeWindow = newWindow
-				startTime = time.Now()
-				runtime.GC()
-			}
-		}
-	},
+type DB struct {
+	connection *sql.DB
 }
 
-func init() {
-	rootCmd.AddCommand(watchCommand)
-}
-
-var X *xgb.Conn
-
-// var aw *xproto.GetInputFocusReply
-// var awClass *xproto.GetPropertyReply
-
-type Window struct {
-	WindowName  string
-	WindowTitle string
-	Usage       time.Duration
-}
-
-func ActiveWindow() (*Window, error) {
-	aw, err := xproto.GetInputFocus(X).Reply()
+func (d *DB) InitConnection() error {
+	db, err := sql.Open("sqlite3", "./watcher.db")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	awClass, err := xproto.GetProperty(X, false, aw.Focus, xproto.AtomWmClass, xproto.GetPropertyTypeAny, 0, (1<<32)-1).Reply()
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS daily_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    window_name TEXT,
+    date TEXT,
+    usage INTEGER
+  )`)
+
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	awTitle, err := xproto.GetProperty(X, false, aw.Focus, xproto.AtomWmName, xproto.GetPropertyTypeAny, 0, (1<<32)-1).Reply()
-	if err != nil {
-		return nil, err
-	}
-
-	appName := strings.Split(string(awClass.Value), "\x00")[1]
-	activeWindowTitle := string(awTitle.Value)
-
-	terminals := []string{
-		"Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix",
-		"Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm",
-	}
-
-	if stringInSlice(appName, terminals) {
-		if strings.Contains(activeWindowTitle, "Nvim") {
-			appName = "NeoVim"
-		} else if strings.Contains(activeWindowTitle, "Vim") {
-			appName = "Vim"
-		} else if strings.Contains(activeWindowTitle, "NVIM") {
-			appName = "LunarVim"
-		}
-	}
-
-	return &Window{
-		WindowName:  appName,
-		WindowTitle: activeWindowTitle,
-	}, nil
+	d.connection = db
+	return nil
 }
 
-func initXConnection() error {
-	var err error
-	X, err = xgb.NewConn()
+func (d *DB) CloseConnection() {
+	if d.connection != nil {
+		d.connection.Close()
+	}
+}
+
+func (d *DB) GetAppUsage(appName string, date string) (time.Duration, error) {
+	var usage time.Duration
+	err := d.connection.QueryRow(`SELECT usage FROM daily_logs WHERE window_name = ? AND date = ?`, appName, date).Scan(&usage)
+	if err != nil {
+		return 0, err
+	}
+	return usage, nil
+}
+
+func (d *DB) InsertOrUpdateAppUsage(appName string, date string, usage time.Duration) error {
+	// first check if the app usage is already present in the db
+	_, err := d.connection.Exec(`INSERT OR REPLACE INTO daily_logs (window_name, date, usage) VALUES (?, ?, ?)`, appName, date, usage)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func closeXConnection() {
-	if X != nil {
-		X.Close()
-	}
+// Display could be macos display or linux display
+// activeWindow, err := Display.getActiveWindow()
+// Display is an interface that has getActiveWindow method so that implementation of this method is abstracted away according to OS
+
+// TODO: not used this interface as of now cause currently no plans to implement this for macos until I got one macos machine
+type Display interface {
+	GetActiveWindow() (*string, error)
 }
 
-// func GetActiveWindowAppname(aw *xproto.GetInputFocusReply, awClass *xproto.GetPropertyReply) (string, error) {
-func GetActiveWindow() (string, error) {
-	aw, err := xproto.GetInputFocus(X).Reply()
+type XDisplay struct {
+	X              *xgb.Conn
+	Usage          map[string]time.Duration
+	ActiveWindow   string
+	PreviousWindow string
+}
+
+func (d *XDisplay) IsActiveWindowChange() (bool, error) {
+	aw, err := xproto.GetInputFocus(d.X).Reply()
 	if err != nil {
-		return "", err
+		return false, err
 	}
 
-	// get the class of the active window
-	awClass, err := xproto.GetProperty(X, false, aw.Focus, xproto.AtomWmClass, xproto.GetPropertyTypeAny, 0, (1<<32)-1).Reply()
+	awClass, err := xproto.GetProperty(d.X, false, aw.Focus, xproto.AtomWmClass, xproto.GetPropertyTypeAny, 0, (1<<32)-1).Reply()
 	if err != nil {
-		return "", err
+		return false, err
 	}
 
-	// convert the class to string
-	appName := strings.Split(string(awClass.Value), "\x00")[1] // splitting depending on null byte
-
-	awTitle, err := xproto.GetProperty(X, false, aw.Focus, xproto.AtomWmName, xproto.GetPropertyTypeAny, 0, (1<<32)-1).Reply()
+	awTitle, err := xproto.GetProperty(d.X, false, aw.Focus, xproto.AtomWmName, xproto.GetPropertyTypeAny, 0, (1<<32)-1).Reply()
 	if err != nil {
-		return "", err
+		return false, err
+	}
+
+	appNameParts := strings.Split(string(awClass.Value), "\x00")
+	var appName string
+	if len(appNameParts) > 1 {
+		appName = appNameParts[1]
+	} else {
+		appName = "Unknown"
 	}
 
 	activeWindowTitle := string(awTitle.Value)
@@ -152,7 +108,7 @@ func GetActiveWindow() (string, error) {
 		"Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm",
 	}
 
-	if stringInSlice(appName, terminals) {
+	if stringInSlice(d.ActiveWindow, terminals) {
 		if strings.Contains(activeWindowTitle, "Nvim") {
 			appName = "NeoVim"
 		} else if strings.Contains(activeWindowTitle, "Vim") {
@@ -162,7 +118,37 @@ func GetActiveWindow() (string, error) {
 		}
 	}
 
-	return appName, nil
+	if d.ActiveWindow != appName {
+		d.PreviousWindow = d.ActiveWindow
+		d.ActiveWindow = appName
+		return true, nil
+	}
+	return false, nil
+}
+
+func (d *XDisplay) initXConnection() error {
+	var err error
+	d.X, err = xgb.NewConn()
+	if err != nil {
+		return err
+	}
+
+	setup := xproto.Setup(d.X)
+	screen := setup.DefaultScreen(d.X)
+	root := screen.Root
+
+	err = xproto.ChangeWindowAttributesChecked(d.X, root, xproto.CwEventMask, []uint32{xproto.EventMaskPropertyChange}).Check()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *XDisplay) closeXConnection() {
+	if d.X != nil {
+		d.X.Close()
+	}
 }
 
 func stringInSlice(str string, slice []string) bool {
@@ -172,4 +158,64 @@ func stringInSlice(str string, slice []string) bool {
 		}
 	}
 	return false
+}
+
+var watchCommand = &cobra.Command{
+	Use:   "watch",
+	Short: "It starts the watching your screen and takes the logs of your usage",
+	Run: func(cmd *cobra.Command, args []string) {
+		// logic to start taking logs and just printing the current app usages as time passes no string in db or logfiles
+
+		// TODO: currently this logic is written in synchronous way, we need to convert this to go routines if needed
+		// implementation with GoRoutines will something like this, first to watch over the change in the current active window and other to check the AFK status of user every status
+
+		display := XDisplay{
+			X:              nil,
+			Usage:          make(map[string]time.Duration),
+			ActiveWindow:   "",
+			PreviousWindow: "",
+		}
+
+		db := DB{
+			connection: nil,
+		}
+
+		err := db.InitConnection()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		display.initXConnection()
+
+		date := time.Now().Format("2006-01-02")
+
+		startTime := time.Now()
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for {
+			isActiveWindowChanged, err := display.IsActiveWindowChange()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if isActiveWindowChanged {
+				display.Usage[display.PreviousWindow] += time.Since(startTime)
+				fmt.Println(display.Usage)
+				db.InsertOrUpdateAppUsage(display.PreviousWindow, date, display.Usage[display.PreviousWindow])
+				startTime = time.Now()
+			}
+
+			time.Sleep(200 * time.Millisecond)
+		}
+
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(watchCommand)
 }
