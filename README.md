@@ -2,7 +2,8 @@
 
 ### Minimal Open source Screen-Time Tracker (CLI-app)
 
-<img src="https://cdn.discordapp.com/attachments/846673042893832195/952274599276580874/watcher.png" width=90% height=auto>
+<img src="https://cdn.discordapp.com/attachments/846673042893832195/952274599276580874/watcher.png?ex=66a34494&is=66a1f314&hm=c2f0781bb59398405824ef2cd5f19c6a66f8124dc872bbb2acb7ce88fbf4dfbd&" width=90% height=auto>
+
 
 ## Table of Contents
 
@@ -21,7 +22,7 @@ Watcher is CLI-app (at this moment) which helps you to get perspective about you
 
 |                                          Day Summary                                          |                                         Week Summary                                          |
 | :-------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: |
-| ![](https://cdn.discordapp.com/attachments/846673042893832195/952283314746691624/unknown.png) | ![](https://cdn.discordapp.com/attachments/846673042893832195/952283190716948521/unknown.png) |
+| ![](https://media.discordapp.net/attachments/846673042893832195/952283314746691624/unknown.png?ex=66a34cb2&is=66a1fb32&hm=114b1316111f1a77ff3bd51f78eb8dbb91fca474202cf521c4525326319fe39d&=&format=webp&quality=lossless&width=608&height=394) | ![](https://cdn.discordapp.com/attachments/846673042893832195/952283190716948521/unknown.png?ex=66a34c95&is=66a1fb15&hm=90b3fcc86c0ad7ad80f178cf2f39ad781d58ee88f06f0876be3b320d5eb67d87&) |
 
 Funfact: You might be thinking how can someone has 14 hrs of screen time in a single day, Well ! short ans is AFK-feature is not implemented yet... Most of the time I left my laptop as it is so it also counts that AFK time as Screen-time
 
