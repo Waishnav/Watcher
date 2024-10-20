@@ -1,6 +1,8 @@
-# Watcher
+# Watcher 
 
 ### Minimal Open source Screen-Time Tracker (CLI-app)
+
+Note: codebase in the python is being under migration in golang, you can checkout `go-migrate` branch for more info.
 
 <img src="https://github.com/user-attachments/assets/e690e23c-3d09-4c23-b490-5cc8eff1a96b" width=90% height=auto>
 
