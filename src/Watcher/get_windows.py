@@ -30,13 +30,13 @@ def active_window():
     aw_title = active_window_title()
     terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm", "Mate-terminal"]
     if active_window in terminals:
-        # We have a terminal open
-        if os.popen('pgrep -a -x -w vim').read() != '':
-            # We have a vim process running - assume that it's active
-            active_window = "Vim"
-        elif os.popen('pgrep -a -x -w nvim').read() != '':
-            # We have a neovim process running
-            active_window = "NeoVim"
+        try:
+            if "nvim" in aw_title:
+                active_window = "NeoVim"
+            elif "vim" in aw_title:
+                active_window = "Vim"
+        except TypeError:
+            None
     return active_window
 
 # returns true if user has move to next app which is not the same as previous
