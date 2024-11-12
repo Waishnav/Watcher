@@ -32,7 +32,7 @@ def active_window():
     terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm", "Mate-terminal"]
     if active_window in terminals:
         if os.popen('pgrep -a -x -w vim').read() != '':
-            vim_processes = os.popen("pgrep -a vim | grep -v embed | awk '{print $1}'").read().strip().split(' ')
+            vim_processes = os.popen("pgrep -a vim | grep -v embed | awk '{print $1}'").read().strip().split('\n')
             for vim_process in vim_processes:
                 if master_check(pid, vim_process):
                     active_window = "Vim"
