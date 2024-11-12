@@ -28,32 +28,16 @@ def active_window():
     # check whether user is using nvim or vim
     active_window = active_window.capitalize()
     aw_title = active_window_title()
-    pid = os.popen('xdotool getwindowpid $(xdotool getactivewindow)').read().strip()
     terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm", "Mate-terminal"]
     if active_window in terminals:
+        # We have a terminal open
         if os.popen('pgrep -a -x -w vim').read() != '':
-            vim_processes = os.popen("pgrep -a vim | grep -v embed | awk '{print $1}'").read().strip().split('\n')
-            for vim_process in vim_processes:
-                if master_check(pid, vim_process):
-                    active_window = "Vim"
-        if os.popen('pgrep -a -x -w nvim').read() != '':
-            # Filter embed processes
-            nvim_processes = os.popen("pgrep -a nvim | grep -v embed | awk '{print $1}'").read().strip().split('\n')
-            for nvim_process in nvim_processes:
-                # Find match for master process
-                if master_check(pid, nvim_process):
-                    active_window = "NeoVim"
+            # We have a vim process running - assume that it's active
+            active_window = "Vim"
+        elif os.popen('pgrep -a -x -w nvim').read() != '':
+            # We have a neovim process running
+            active_window = "NeoVim"
     return active_window
-
-def master_check(master_process, process):
-    # Recursively check the master processes to confirm if master terminal is the active terminal
-    master = os.popen(f"ps -p {process} -o ppid=").read().strip()
-    if master != master_process and master != '':
-        return master_check(master_process, master)
-    elif master == '':
-        return False
-    else:
-        return True
 
 # returns true if user has move to next app which is not the same as previous
 def previous_window(array_of_window, active_window):
