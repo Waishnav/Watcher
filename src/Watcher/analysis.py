@@ -6,7 +6,7 @@ import time_operations as to
 
 # creating dictionary to store time spend on each applicaitons on that particular day
 def final_report(date):
-    path = "/home/" + os.getlogin() +"/.cache/Watcher/daily_data/"
+    path = os.environ['HOME'] +"/.cache/Watcher/daily_data/"
     filename = path + date + ".csv"
 
     report = dict()
@@ -63,8 +63,8 @@ def weekday_from_date(date):
     return day[0:-1]
 
 def weekly_logs(week = str(os.popen('''date +"W%V-%Y"''').read()[0:-1])):
-    user = os.getlogin()
-    filename = "/home/"+user+"/.cache/Watcher/Analysis/"+week+".csv"
+    user = os.environ['HOME']
+    filename = user+"/.cache/Watcher/Analysis/"+week+".csv"
     with open(filename, "w") as csvfile:
         csvwriter = csv.writer(csvfile, delimiter='\t')
 

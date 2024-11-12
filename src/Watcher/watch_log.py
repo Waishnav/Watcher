@@ -16,7 +16,7 @@ def get_date():
     return d[0:-1]
 
 def update_csv(date, Data):
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
+    filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+date+".csv"
     overwrite_Data = []
     with open(filename, 'w') as csvfile:
         for x,y in Data.items():
@@ -43,9 +43,9 @@ def import_data(file):
 # TODO: AFK feature devlopement (it will be developed after completing alpha product (after whole project up end running)
 
 def log_creation():
-    filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+    filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv"
     if not(os.path.isfile(filename)):
-        creat_file = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+        creat_file = os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv"
         with open(creat_file, 'w') as fp:
             pass
 
@@ -54,7 +54,7 @@ def log_creation():
     data = import_data(filename)
     while True:
         date = get_date()
-        filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
+        filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+date+".csv"
         afk = y.is_afk(afkTimeout)
         print(data)
 
@@ -71,10 +71,10 @@ def log_creation():
 
             usage = time_addition("00:00:01", usage)
             data.update({active_window : usage})
-            if os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"):
+            if os.path.isfile(os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv"):
                 update_csv(get_date(), data)
-            elif not(os.path.isfile("/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
-                new_filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+get_date()+".csv"
+            elif not(os.path.isfile(os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv")):
+                new_filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv"
                 with open(new_filename, 'w') as fp:
                     pass
 
