@@ -71,8 +71,8 @@ def daily_summary(date = get_date()):
         print("   " + Color.GREEN(f'{x:<22}') + '\t ',f'{to.format_time(y):>12}')
 
 def week_summary(week = os.popen('''date +"W%V-%Y"''').read()[:-1]):
-    user = os.getlogin()
-    filename = "/home/"+user+"/.cache/Watcher/Analysis/"+week+".csv"
+    user = os.environ['HOME']
+    filename = user+"/.cache/Watcher/Analysis/"+week+".csv"
     with open(filename, 'r') as file:
         csvreader = csv.reader(file, delimiter='\t')
         week_overview = dict()

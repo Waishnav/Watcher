@@ -28,7 +28,7 @@ def active_window():
     # check whether user is using nvim or vim
     active_window = active_window.capitalize()
     aw_title = active_window_title()
-    terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm"]
+    terminals = ["Kitty", "Alacritty", "Terminator", "Tilda", "Guake", "Yakuake", "Roxterm", "Eterm", "Rxvt", "Xterm", "Tilix", "Lxterminal", "Konsole", "St", "Gnome-terminal", "Xfce4-terminal", "Terminology", "Extraterm", "Mate-terminal"]
     if active_window in terminals:
         try:
             if "nvim" in aw_title:
