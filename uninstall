@@ -1,13 +1,78 @@
 #!/bin/bash
-sudo rm -rf /usr/share/Watcher/
-sudo rm -rf /usr/local/bin/watcher
 
-echo "Do you want to delete your raw_data files?? y or n (default: n)"
-read yes_or_no
+echo "[INFO] Starting Watcher (Go version) uninstallation..."
+sleep 1
 
-if [[ $yes_or_no = y ]]; then
-    rm -rf ~/.cache/Watcher/
+# --- Remove Binary ---
+echo "[INFO] Removing Watcher binary from /usr/local/bin/watcher..."
+if [ -f "/usr/local/bin/watcher" ]; then
+    if sudo rm /usr/local/bin/watcher; then
+        echo "[SUCCESS] Watcher binary removed from /usr/local/bin/watcher."
+    else
+        echo "[ERROR] Failed to remove Watcher binary. sudo privileges might be required or the file is already removed."
+        # Continue script, as user might want to remove cache or .xprofile entries anyway
+    fi
 else
-    echo "Nice Decision either way you might use this app in future"
+    echo "[INFO] Watcher binary not found at /usr/local/bin/watcher (already removed or never installed to this location)."
 fi
+sleep 1
 
+# --- Remove .xprofile entry ---
+# This part attempts to remove the watcher autostart line from .xprofile
+# It's a bit more involved as we want to be careful not to break the file.
+echo "[INFO] Checking .xprofile for Watcher auto-start entry..."
+if [ -f "$HOME/.xprofile" ]; then
+    # Check if the specific line exists
+    if grep -q "watcher start &" "$HOME/.xprofile"; then
+        echo "[INFO] Watcher auto-start entry found in .xprofile. Attempting to remove it."
+        # Create a backup
+        cp "$HOME/.xprofile" "$HOME/.xprofile.bak"
+        echo "[INFO] Backup of .xprofile created at ~/.xprofile.bak"
+        
+        # Use sed to delete the line. Using a unique part of the line.
+        # Also removing the comment line if it exists right before.
+        sed -i '/# Start Watcher application/d' "$HOME/.xprofile" # Remove comment if it exists
+        sed -i '/watcher start &/d' "$HOME/.xprofile"            # Remove the command
+        
+        # Optional: Remove empty lines if the file becomes empty or has multiple empty lines due to removal
+        # This is a simple way to clean up, might need more sophisticated logic for complex .xprofile files
+        if [ -s "$HOME/.xprofile" ]; then
+             # Remove trailing blank lines
+            sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' "$HOME/.xprofile"
+        else
+            echo "[INFO] .xprofile is empty after removing Watcher entry. You may consider deleting it if not used by other applications."
+        fi
+        echo "[SUCCESS] Watcher auto-start entry removed from .xprofile."
+    else
+        echo "[INFO] No Watcher auto-start entry found in .xprofile."
+    fi
+else
+    echo "[INFO] .xprofile not found. No auto-start entry to remove."
+fi
+sleep 1
+
+# --- Remove Cache Directory (Optional) ---
+echo ""
+read -p "Do you want to remove all watcher data from ~/.cache/Watcher? This includes all logs and analysis. [y/N]: " choice
+case "$choice" in 
+  y|Y ) 
+    echo "[INFO] Removing cache directory ~/.cache/Watcher..."
+    if rm -rf ~/.cache/Watcher; then
+        echo "[SUCCESS] Cache directory ~/.cache/Watcher removed."
+    else
+        echo "[ERROR] Failed to remove cache directory ~/.cache/Watcher. Check permissions or remove manually."
+    fi
+    ;;
+  * ) 
+    echo "[INFO] Cache directory ~/.cache/Watcher was not removed."
+    ;;
+esac
+sleep 1
+
+# --- Final Instructions ---
+echo ""
+echo "[SUCCESS] Watcher uninstallation process completed."
+echo "If you had Watcher auto-starting via other methods (e.g., systemd, .desktop files), you may need to remove those manually."
+echo "Thank you for using Watcher!"
+
+exit 0

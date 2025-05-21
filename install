@@ -1,59 +1,111 @@
 #!/bin/bash
-git clone https://github.com/Waishnav/Watcher -b v2.0 && cd Watcher
 
-echo "[✔] First of all Thanks for dropping by!."
-sleep 1s
-echo "[✔] And...FYI Watcher uses very less resources like almost 10 MBs."
-sleep 1s
-echo "[✔] Also some of the features are in development AFK is one of them"
-sleep 2s
-echo "[✔] So let's start installation process... "
+echo "[INFO] Starting Watcher (Go version) installation..."
+sleep 1
 
-sudo cp -r ./src/Watcher /usr/share/
-echo "[✔] Copying Watcher to /usr/share/"
-sudo cp -r ./src/bin/watcher /usr/local/bin/
-echo "[✔] Copying watcher executable to /usr/local/bin/"
-sudo chmod +x /usr/local/bin/watcher
-echo "[✔] Making it executable by giving it permission"
+# --- Dependency Checks ---
+echo "[INFO] Checking for required dependencies..."
+missing_deps=false
 
-# making directory for log-files (where all you daily logs are stored)
-mkdir -p ~/.cache/Watcher/
-echo "[✔] To store raw_data making directory as ~/.cache/Watcher"
-mkdir -p ~/.cache/Watcher/daily_data/
-mkdir -p ~/.cache/Watcher/Analysis/
+if ! command -v xprintidle &> /dev/null; then
+    echo "[ERROR] xprintidle could not be found. Please install it first."
+    echo "        On Debian/Ubuntu: sudo apt-get install xprintidle"
+    missing_deps=true
+fi
 
-# deleting folowing lines "[ -f /etc/xprofile ] && . /etc/xprofile/" and "[ -f ~/.xprofile ] && . ~/.xprofile"
-if [ -f "$HOME/.xinitrc" ];
-then
-    sed -i '/xprofile/d' ~/.xinitrc
-    # checking wherther is ~/.xprofile is sourced in ~/.xintrc or not
-    count1=$(grep -c "xprofile" $HOME/.xinitrc)
+if ! command -v xdotool &> /dev/null; then
+    echo "[ERROR] xdotool could not be found. Please install it first."
+    echo "        On Debian/Ubuntu: sudo apt-get install xdotool"
+    missing_deps=true
+fi
+
+if ! command -v go &> /dev/null; then
+    echo "[ERROR] Go (golang) could not be found. Please install it first."
+    echo "        Follow instructions at https://golang.org/doc/install"
+    missing_deps=true
+fi
+
+if [ "$missing_deps" = true ]; then
+    echo "[FATAL] Required dependencies are missing. Please install them and re-run the script."
+    exit 1
+fi
+echo "[INFO] All required dependencies found."
+sleep 1
+
+# --- Go Compilation ---
+echo "[INFO] Compiling the Watcher Go application..."
+if go build -o watcher main.go; then
+    echo "[SUCCESS] Watcher compiled successfully."
 else
-    count1=0
+    echo "[FATAL] Failed to compile Watcher. Please check Go installation and project integrity."
+    exit 1
 fi
-# checking whether user have used watcher before as well as xprofile filed setup or not
-if [ -f "$HOME/.xprofile" ];
-then
-    count2=$(grep -c "watcher --start" $HOME/.xprofile)
+sleep 1
+
+# --- Binary Placement ---
+echo "[INFO] Installing Watcher binary to /usr/local/bin/..."
+if sudo cp ./watcher /usr/local/bin/watcher; then
+    echo "[SUCCESS] Watcher binary copied to /usr/local/bin/watcher."
 else
-    count2=0
+    echo "[FATAL] Failed to copy Watcher binary. sudo privileges might be required or /usr/local/bin is not writable."
+    exit 1
 fi
 
-echo "[✔] Making sure that it will run at startup of the system"
-
-if [ $count2 = 0 ];
-then
-   echo "watcher --start &" >> $HOME/.xprofile
+echo "[INFO] Making the binary executable..."
+if sudo chmod +x /usr/local/bin/watcher; then
+    echo "[SUCCESS] Watcher binary is now executable."
+else
+    echo "[FATAL] Failed to set executable permission on /usr/local/bin/watcher."
+    exit 1
 fi
+sleep 1
 
-if [ -f "$HOME/.xinitrc" ];
-then
-    if [ $count1 = 0 ] ;
-    then
-        echo "source ~/.xprofile" >> $HOME/.xinitrc
+# --- Cache Directory Creation ---
+# The application itself will create daily_data and Analysis subdirectories.
+# We only need to ensure the base directory exists.
+echo "[INFO] Ensuring base cache directory exists at ~/.cache/Watcher..."
+if mkdir -p ~/.cache/Watcher; then
+    echo "[SUCCESS] Base cache directory ensured."
+else
+    echo "[WARNING] Could not create base cache directory ~/.cache/Watcher. The application might fail if it cannot create it either."
+fi
+sleep 1
+
+# --- Auto-start (X11 specific - kept from original, user might need to adapt for Wayland/other DEs) ---
+# This part is for X11 sessions using .xprofile.
+# Users on Wayland or different desktop environments might need other autostart methods (e.g., systemd user services, .desktop files in ~/.config/autostart).
+echo "[INFO] Setting up auto-start for X11 sessions (via .xprofile)..."
+if [ -f "$HOME/.xprofile" ]; then
+    # Check if watcher start command already exists
+    if ! grep -q "watcher start &" "$HOME/.xprofile"; then
+        echo "[INFO] Adding watcher to .xprofile for auto-start."
+        echo "" >> "$HOME/.xprofile" # Add a newline for separation
+        echo "# Start Watcher application" >> "$HOME/.xprofile"
+        echo "watcher start &" >> "$HOME/.xprofile"
+    else
+        echo "[INFO] Watcher auto-start already configured in .xprofile."
     fi
+else
+    echo "[INFO] .xprofile not found. Creating and configuring for Watcher auto-start."
+    echo "# Start Watcher application" > "$HOME/.xprofile"
+    echo "watcher start &" >> "$HOME/.xprofile"
+    echo "[INFO] Please ensure your display manager sources ~/.xprofile (e.g., by adding 'source ~/.xprofile' to ~/.xinitrc if using startx)."
 fi
+sleep 1
 
-echo "Now you can use Watcher after restart. And see you around"
-echo "If anything goes wrong do PR or open issue"
-echo '''If you wanna just give a try (without restart), You can start taking logs (run watch_log.py) by 'watcher --start' '''
+# --- Final Instructions ---
+echo ""
+echo "[SUCCESS] Watcher installation completed!"
+echo "You can now use the 'watcher' command."
+echo "Try 'watcher --help' for available commands."
+echo "For the logging service to start automatically, you may need to restart your X session or reboot."
+echo "Alternatively, you can start it manually now by running: watcher start"
+echo ""
+echo "If anything goes wrong, please open an issue or submit a PR at the project repository."
+
+# Cleanup compiled binary from current directory if desired, as it's now in PATH
+# rm ./watcher
+# For testing, it's better to keep it to immediately verify.
+# The user can remove the cloned/downloaded Watcher directory after installation.
+
+exit 0
