@@ -18,7 +18,7 @@ def is_afk(timeout):
     timeout = timeout * 60 * 1000 - 100 # minimizing 100 milisec error
     #If the AFK feature is installed
     try:
-        idle_output = os.popen("xprintidle").read()[:-1]
+        idle_output = os.popen("xprintidle 2>/dev/null").read()[:-1]
         if not idle_output or "extension not supported" in idle_output:
             return False
         time_since_last_input = int(idle_output)
