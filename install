@@ -1,5 +1,4 @@
 #!/bin/bash
-git clone https://github.com/Waishnav/Watcher -b v2.0 && cd Watcher && ./install
 
 echo "[✔] First of all Thanks for dropping by!."
 sleep 1s
@@ -9,9 +8,10 @@ echo "[✔] Also some of the features are in development AFK is one of them"
 sleep 2s
 echo "[✔] So let's start installation process... "
 
-sudo cp -r ./src/Watcher /usr/share/
+sudo mkdir -p /usr/share/Watcher/
+sudo cp -r ./src/Watcher/* /usr/share/Watcher/
 echo "[✔] Copying Watcher to /usr/share/"
-sudo cp -r ./src/bin/watcher /usr/local/bin/
+sudo cp ./src/bin/watcher /usr/local/bin/
 echo "[✔] Copying watcher executable to /usr/local/bin/"
 sudo chmod +x /usr/local/bin/watcher
 echo "[✔] Making it executable by giving it permission"

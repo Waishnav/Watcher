@@ -56,8 +56,7 @@ def log_creation():
         date = get_date()
         filename = "/home/"+os.getlogin()+"/.cache/Watcher/daily_data/"+date+".csv"
         afk = y.is_afk(afkTimeout)
-        print(data)
-
+        
         if not(afk):
             active_window = x.active_window()
             usage = data.get(active_window)

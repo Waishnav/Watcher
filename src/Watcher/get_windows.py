@@ -1,7 +1,16 @@
 import os
+import json
 
 # get title name of app that user working on
 def active_window_title():
+    if os.environ.get("XDG_CURRENT_DESKTOP") == "Hyprland":
+        try:
+            output = os.popen("hyprctl activewindow -j").read()
+            data = json.loads(output)
+            return data.get("title", "")
+        except:
+            return ""
+
     active_window_title = os.popen('''xprop -id $(xdotool getwindowfocus) WM_NAME''').read()[19:-2]
     a = active_window_title.find('"')
     active_window_title = active_window_title[a+1:]
@@ -13,13 +22,21 @@ def active_window_title():
 
 # get classname of app that user working on
 def active_window():
-    actv_id = os.popen("xdotool getwindowfocus").read()[:-1]
-    if len(actv_id) == 4:
-        active_window = ""
+    if os.environ.get("XDG_CURRENT_DESKTOP") == "Hyprland":
+        try:
+            output = os.popen("hyprctl activewindow -j").read()
+            data = json.loads(output)
+            active_window = data.get("initialClass", data.get("class", ""))
+        except:
+            active_window = ""
     else:
-        active_window = os.popen("xprop -id $(xdotool getwindowfocus) | grep CLASS ").read()
-        if active_window != "":
-            active_window = active_window[19:-1].replace('''"''', "").split(", ")[1]
+        actv_id = os.popen("xdotool getwindowfocus").read()[:-1]
+        if len(actv_id) == 4 or "failed" in actv_id:
+            active_window = ""
+        else:
+            active_window = os.popen("xprop -id $(xdotool getwindowfocus) | grep CLASS ").read()
+            if active_window != "":
+                active_window = active_window[19:-1].replace('''"''', "").split(", ")[1]
 
     if "XGetWindowProperty[_NET_ACTIVE_WINDOW] failed" in active_window:
         active_window = ""
