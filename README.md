@@ -31,20 +31,20 @@ Funfact: You might be thinking how can someone has 14 hrs of screen time in a si
 - First, Install the following dependancy `xprintidle` and `xdotool`
 
 ```bash
-$ sudo [package-manager] install xprintidle xdotool
+sudo [package-manager] install xprintidle xdotool
 ```
 
 - Second, Clone this repository and cd into it-
 
 ```bash
-$ git clone https://github.com/Waishnav/Watcher
-$ cd ./Watcher/
+git clone https://github.com/Waishnav/Watcher
+cd ./Watcher/
 ```
 
 - Then run install script
 
 ```bash
-$ chmod +x ./install && ./install
+chmod +x ./install && ./install
 ```
 
 ### Want to Contribute
