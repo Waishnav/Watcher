@@ -1,0 +1,17 @@
+[package]
+name = "watcherd"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+watcher-core = { path = "../../crates/watcher-core" }
+watcher-ipc = { path = "../../crates/watcher-ipc" }
+watcher-storage = { path = "../../crates/watcher-storage" }
+watcher-platform = { path = "../../crates/watcher-platform" }
+serde_json = "1"
+fs2 = "0.4"
+chrono = "0.4"
+ctrlc = "3"

@@ -1,1 +1,27 @@
-src/Watcher/__pycache__/*
+# Rust
+/target/
+**/*.rs.bk
+
+# Bun / TypeScript
+**/node_modules/
+**/dist/
+**/.tsbuildinfo
+
+# Python legacy cache
+**/__pycache__/
+**/*.pyc
+
+# Local QA and activity data (must never enter git)
+/.watcher-dev/
+/.qa/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.db-shm
+*.db-wal
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
