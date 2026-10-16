@@ -10,6 +10,30 @@ pub struct Store {
 }
 
 impl Store {
+    /// A provisional interval and retroactive idle correction must be atomic.
+    pub fn apply(
+        &mut self,
+        interval: Option<&Interval>,
+        idle_since_ms: Option<i64>,
+        until_ms: i64,
+    ) -> rusqlite::Result<()> {
+        self.conn.execute_batch("SAVEPOINT watcher_observation")?;
+        let result = (|| {
+            if let Some(interval) = interval {
+                self.append(interval)?;
+            }
+            if let Some(since) = idle_since_ms {
+                self.replace_recent_with_idle(since, until_ms)?;
+            }
+            Ok(())
+        })();
+        if result.is_err() {
+            let _ = self.conn.execute_batch("ROLLBACK TO watcher_observation");
+        }
+        self.conn.execute_batch("RELEASE watcher_observation")?;
+        result
+    }
+
     pub fn open(path: &Path) -> rusqlite::Result<Self> {
         let conn = Connection::open(path)?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
@@ -49,7 +73,7 @@ impl Store {
         let previous = self
             .conn
             .query_row(
-                "SELECT id, end_ms, app, state FROM activity_intervals ORDER BY id DESC LIMIT 1",
+                "SELECT id, end_ms, app, state FROM activity_intervals ORDER BY end_ms DESC, id DESC LIMIT 1",
                 [],
                 |row| {
                     Ok((
@@ -88,9 +112,9 @@ impl Store {
         Ok(())
     }
 
-    /// Replace a provisional recent activity span when an idle signal arrives
-    /// after the configured timeout. This removes every overlapping state from
-    /// this session (not only the most recent focused application).
+    /// Replace only the provisional *active* portions, preserving pauses,
+    /// unknown coverage and earlier idle events. A late idle notification must
+    /// never corrupt other state or a disconnected collector's history.
     pub fn replace_recent_with_idle(
         &mut self,
         since_ms: i64,
@@ -99,19 +123,38 @@ impl Store {
         if since_ms >= until_ms {
             return Ok(());
         }
-        let tx = self.conn.transaction()?;
-        tx.execute(
-            "DELETE FROM activity_intervals WHERE start_ms >= ?",
-            [since_ms],
-        )?;
-        tx.execute(
-            "UPDATE activity_intervals SET end_ms=? WHERE start_ms < ? AND end_ms > ?",
-            params![since_ms, since_ms, since_ms],
-        )?;
-        tx.execute(
-            "INSERT INTO activity_intervals(start_ms,end_ms,app,state) VALUES(?,?,NULL,'idle')",
-            params![since_ms, until_ms],
-        )?;
+        let tx = self.conn.savepoint()?;
+        let segments: Vec<(i64, i64, i64, Option<String>)> = {
+            let mut stmt = tx.prepare(
+                "SELECT id,start_ms,end_ms,app FROM activity_intervals
+                 WHERE state='active' AND end_ms > ? AND start_ms < ? ORDER BY start_ms",
+            )?;
+            stmt.query_map(params![since_ms, until_ms], |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
+            })?
+            .collect::<rusqlite::Result<_>>()?
+        };
+        for (id, start, end, app) in segments {
+            tx.execute("DELETE FROM activity_intervals WHERE id=?", [id])?;
+            let left = start.max(since_ms);
+            let right = end.min(until_ms);
+            if start < left {
+                tx.execute(
+                    "INSERT INTO activity_intervals(start_ms,end_ms,app,state) VALUES(?,?,?,'active')",
+                    params![start,left,app],
+                )?;
+            }
+            tx.execute(
+                "INSERT INTO activity_intervals(start_ms,end_ms,app,state) VALUES(?,?,NULL,'idle')",
+                params![left, right],
+            )?;
+            if right < end {
+                tx.execute(
+                    "INSERT INTO activity_intervals(start_ms,end_ms,app,state) VALUES(?,?,?,'active')",
+                    params![right,end,app],
+                )?;
+            }
+        }
         tx.commit()
     }
 
@@ -176,12 +219,79 @@ mod tests {
         assert_eq!(store.query(0, 10_000, 100).unwrap().len(), 2);
         store.replace_recent_with_idle(3000, 6000).unwrap();
         let data = store.query(0, 10_000, 100).unwrap();
-        assert_eq!(data.len(), 2);
+        assert_eq!(data.len(), 3);
         assert_eq!((data[0].start_ms, data[0].end_ms), (1000, 3000));
         assert_eq!(
             (data[1].start_ms, data[1].end_ms, data[1].state),
-            (3000, 6000, ActivityState::Idle)
+            (3000, 4000, ActivityState::Idle)
         );
+        assert_eq!(
+            (data[2].start_ms, data[2].end_ms, data[2].state),
+            (4000, 5000, ActivityState::Idle)
+        );
+    }
+
+    #[test]
+    fn late_idle_preserves_paused_and_unknown_segments() {
+        let mut db = Store::open(Path::new(":memory:")).unwrap();
+        for (start_ms, end_ms, state) in [
+            (0, 1000, ActivityState::Active),
+            (1000, 2000, ActivityState::Paused),
+            (2000, 3000, ActivityState::Unknown),
+            (3000, 4000, ActivityState::Active),
+        ] {
+            db.append(&Interval {
+                start_ms,
+                end_ms,
+                app: Some("A".into()),
+                state,
+            })
+            .unwrap();
+        }
+        db.replace_recent_with_idle(500, 4000).unwrap();
+        let rows = db.query(0, 5000, 100).unwrap();
+        assert_eq!(
+            rows.iter()
+                .filter(|r| r.state == ActivityState::Paused)
+                .count(),
+            1
+        );
+        assert_eq!(
+            rows.iter()
+                .filter(|r| r.state == ActivityState::Unknown)
+                .count(),
+            1
+        );
+        assert_eq!(
+            rows.iter()
+                .filter(|r| r.state == ActivityState::Idle)
+                .map(|r| r.end_ms - r.start_ms)
+                .sum::<i64>(),
+            1500
+        );
+    }
+
+    #[test]
+    fn atomic_transition_rolls_back_on_conflict() {
+        let mut db = Store::open(Path::new(":memory:")).unwrap();
+        db.append(&Interval {
+            start_ms: 10,
+            end_ms: 20,
+            app: Some("A".into()),
+            state: ActivityState::Active,
+        })
+        .unwrap();
+        let conflict = Interval {
+            start_ms: 15,
+            end_ms: 30,
+            app: Some("B".into()),
+            state: ActivityState::Active,
+        };
+        assert!(db.apply(Some(&conflict), Some(10), 30).is_err());
+        let existing = db.query(0, 100, 10).unwrap();
+        assert_eq!(existing.len(), 1);
+        assert_eq!(existing[0].state, ActivityState::Active);
+        assert_eq!(existing[0].end_ms, 20);
     }
 
     #[test]

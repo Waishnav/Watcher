@@ -102,6 +102,9 @@ pub enum Observation {
     Paused(bool),
     /// The compositor stopped delivering trustworthy information.
     Gap,
+    /// Clock/suspend discontinuity. Keep the last known app but require a
+    /// *fresh input observation* before crediting activity again.
+    TimeDiscontinuity,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -197,7 +200,7 @@ impl Reducer {
         let idle_since_ms = if matches!(observation, Observation::Input(InputState::Idle))
             && !self.paused
             && self.input_available
-            && self.input != InputState::Idle
+            && self.state() == ActivityState::Active
         {
             last_input_ms.map(|t| t.clamp(self.started_ms, self.since_ms))
         } else {
@@ -223,6 +226,9 @@ impl Reducer {
                 self.focus_available = false;
                 self.focus = None;
                 self.input_available = false;
+                self.input = InputState::Unknown;
+            }
+            Observation::TimeDiscontinuity => {
                 self.input = InputState::Unknown;
             }
         }
@@ -277,12 +283,36 @@ mod tests {
     #[test]
     fn idle_cutoff_is_clamped_to_current_session() {
         let mut reducer = Reducer::new(1000);
+        reducer.apply(1000, Observation::FocusAvailable(true), None);
+        reducer.apply(1000, Observation::Focus(Some("A".into())), None);
         reducer.apply(1000, Observation::InputAvailable(true), None);
+        reducer.apply(1000, Observation::Input(InputState::Active), None);
         let change = reducer.apply(62_000, Observation::Input(InputState::Idle), Some(0));
         assert_eq!(change.idle_since_ms, Some(1000));
-        assert_eq!(reducer.snapshot().state, ActivityState::Unknown);
+        assert_eq!(reducer.snapshot().state, ActivityState::Idle);
         reducer.apply(63_000, Observation::Input(InputState::Active), None);
         assert_eq!(reducer.snapshot().input, InputState::Active);
+    }
+
+    #[test]
+    fn no_idle_rewind_across_pause_or_unknown_coverage() {
+        let mut reducer = Reducer::new(1);
+        reducer.apply(1, Observation::InputAvailable(true), None);
+        reducer.apply(1, Observation::FocusAvailable(true), None);
+        reducer.apply(1, Observation::Focus(Some("A".into())), None);
+        reducer.apply(1, Observation::Input(InputState::Active), None);
+        reducer.apply(900, Observation::Paused(true), None);
+        reducer.apply(1800, Observation::Paused(false), None);
+        let change = reducer.apply(2000, Observation::Input(InputState::Idle), Some(1));
+        assert_eq!(change.idle_since_ms, Some(1));
+        reducer.apply(2100, Observation::Input(InputState::Active), None);
+        reducer.apply(2200, Observation::Gap, None);
+        assert_eq!(
+            reducer
+                .apply(2300, Observation::Input(InputState::Idle), Some(1))
+                .idle_since_ms,
+            None
+        );
     }
 
     #[test]
@@ -290,6 +320,24 @@ mod tests {
         let mut reducer = Reducer::new(2000);
         assert!(reducer.tick(1000).is_none());
         assert_eq!(reducer.tick(3000).unwrap().start_ms, 2000);
+    }
+
+    #[test]
+    fn suspend_gap_requires_fresh_input_signal() {
+        let mut reducer = Reducer::new(0);
+        reducer.apply(0, Observation::FocusAvailable(true), None);
+        reducer.apply(0, Observation::InputAvailable(true), None);
+        reducer.apply(0, Observation::Focus(Some("editor".into())), None);
+        reducer.apply(0, Observation::Input(InputState::Active), None);
+        let span = reducer
+            .apply(100, Observation::TimeDiscontinuity, None)
+            .interval
+            .unwrap();
+        assert_eq!(span.state, ActivityState::Active);
+        assert_eq!(reducer.tick(10_000).unwrap().state, ActivityState::Unknown);
+        assert_eq!(reducer.snapshot().app.as_deref(), Some("editor"));
+        reducer.apply(10_010, Observation::Input(InputState::Active), None);
+        assert_eq!(reducer.snapshot().state, ActivityState::Active);
     }
 
     #[test]

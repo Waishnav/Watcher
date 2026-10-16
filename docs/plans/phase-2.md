@@ -1,6 +1,6 @@
 # Phase 2 — Cross-platform collectors + honest compatibility
 
-**Status:** planned; starts **after Phase 1 is accepted and its engine contracts are stable**.
+**Status:** adapters and portable plumbing in progress; native desktop QA pending. For actual implementation evidence and dependency research see [Phase 2 implementation](phase-2-implementation.md) and [QA log](../qa/phase-2.md).
 **Goal:** same Watcher daemon, data model, CLI and OpenTUI on Linux X11, additional Wayland compositors, Windows, and macOS, with verified foreground and idle behavior wherever native APIs permit it.
 
 Phase 2 is fundamentally an **integration and capability management** project, not an analytics rewrite. Refer to [architecture.md](architecture.md) for invariants, security, time semantics and module seams.

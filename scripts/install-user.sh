@@ -4,7 +4,11 @@ set -euo pipefail
 
 repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 bin_dir="${WATCHER_BIN_DIR:-${HOME}/.local/bin}"
-tui_dir="${WATCHER_TUI_DIR:-${XDG_DATA_HOME:-${HOME}/.local/share}/watcher/tui}"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  tui_dir="${WATCHER_TUI_DIR:-${HOME}/Library/Application Support/watcher/tui}"
+else
+  tui_dir="${WATCHER_TUI_DIR:-${XDG_DATA_HOME:-${HOME}/.local/share}/watcher/tui}"
+fi
 
 command -v cargo >/dev/null || { echo "Rust/cargo required" >&2; exit 1; }
 command -v bun >/dev/null || { echo "Bun required for OpenTUI" >&2; exit 1; }

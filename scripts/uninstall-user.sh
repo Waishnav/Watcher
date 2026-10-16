@@ -2,7 +2,11 @@
 # Removes installed executables and OpenTUI; historical activity is not deleted.
 set -euo pipefail
 bin_dir="${WATCHER_BIN_DIR:-${HOME}/.local/bin}"
-tui_dir="${WATCHER_TUI_DIR:-${XDG_DATA_HOME:-${HOME}/.local/share}/watcher/tui}"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  tui_dir="${WATCHER_TUI_DIR:-${HOME}/Library/Application Support/watcher/tui}"
+else
+  tui_dir="${WATCHER_TUI_DIR:-${XDG_DATA_HOME:-${HOME}/.local/share}/watcher/tui}"
+fi
 echo "Stop the daemon first: $bin_dir/watcher shutdown"
 for executable in watcher watcherd; do
   if [[ -f "$bin_dir/$executable" ]]; then

@@ -65,7 +65,7 @@ See [Phase 1 implementation plan](docs/plans/phase-1.md), [Phase 2 plan](docs/pl
 ## Limitations
 
 - Only Hyprland is implemented. Cross-platform Rust builds in CI are **not** equivalent to a working Windows/macOS collector.
-- GNOME/KDE Wayland, Sway, X11, Windows and macOS collectors are scheduled for Phase 2. No WXT extension yet.
+- Sway, X11, Windows and macOS collectors are implemented experimentally for Phase 2; GNOME/KDE have source-level opt-in focus bridges. All still require native/live verification. No WXT extension yet.
 - Idle input protocol support must be available from the Wayland compositor. Screen locks, suspend/recovery, and clock anomalies can produce unknown coverage.
 - Media playback time is not classified yet; media playing while idle is **not** counted as active interaction. Attention inference is not implemented.
 - OpenTUI currently runs via Bun from an installed TypeScript package; fully standalone bundling will be addressed separately.
@@ -74,3 +74,9 @@ See [Phase 1 implementation plan](docs/plans/phase-1.md), [Phase 2 plan](docs/pl
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [CONTEXT.md](CONTEXT.md). MIT licensed.
+
+## Phase 2 development / experimental collectors
+
+The shared collector seam now includes **X11**, **Sway**, **Windows**, and **macOS** adapters. These are **not yet declared production-supported**: Windows and macOS must pass native builds and real desktop verification; X11's isolated Xvfb job and Sway's real compositor QA are pending. GNOME Wayland and KDE Plasma Wayland have **experimental, opt-in focus bridge source code** under `integrations/` (no automatic installation); neither bridge is verified on its corresponding desktop. Unsupported or missing focus signals must not be counted as active usage. See [Phase 2 implementation/dependency research](docs/plans/phase-2-implementation.md) and [QA matrix](docs/qa/phase-2.md).
+
+Windows development builds use native named pipes and per-user data under `%LOCALAPPDATA%`; PowerShell setup scripts are in `scripts/install-user.ps1` and `scripts/uninstall-user.ps1`. macOS uses AppKit/CoreGraphics and user data under `~/Library/Application Support/watcher`. These scripts are not yet verified on Windows/macOS hosts. An X11-only graphical integration test is designed to run under an isolated Xvfb display, never against your active desktop.

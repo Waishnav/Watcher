@@ -22,12 +22,49 @@ pub fn paths(dev: bool) -> Result<Paths, String> {
             .map_err(|e| e.to_string())?
             .join(".watcher-dev")
     } else {
+        #[cfg(windows)]
+        let base = std::env::var_os("LOCALAPPDATA")
+            .map(PathBuf::from)
+            .ok_or("missing LOCALAPPDATA")?;
+        #[cfg(target_os = "macos")]
+        let base = std::env::var_os("HOME")
+            .map(|h| PathBuf::from(h).join("Library/Application Support"))
+            .ok_or("missing HOME")?;
+        #[cfg(not(any(windows, target_os = "macos")))]
         let base = std::env::var_os("XDG_DATA_HOME")
             .map(PathBuf::from)
             .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".local/share")))
             .ok_or("missing HOME or XDG_DATA_HOME")?;
         base.join("watcher")
     };
+    #[cfg(windows)]
+    let socket = {
+        let user = format!(
+            "{}-{}",
+            std::env::var("USERDOMAIN").unwrap_or_default(),
+            std::env::var("USERNAME").unwrap_or_else(|_| "unknown".into())
+        );
+        let safe: String = user
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric() || *c == '-')
+            .take(80)
+            .collect();
+        let mut hash = 0xcbf29ce484222325u64;
+        for b in data.to_string_lossy().as_bytes() {
+            hash = (hash ^ u64::from(*b)).wrapping_mul(0x100000001b3);
+        }
+        PathBuf::from(format!(
+            r"\\.\pipe\watcher-{}-{:016x}-{}",
+            safe,
+            hash,
+            if override_dir.is_some() || dev {
+                "dev"
+            } else {
+                "main"
+            }
+        ))
+    };
+    #[cfg(not(windows))]
     let socket = if override_dir.is_some() || dev {
         data.join("daemon.sock")
     } else {

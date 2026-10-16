@@ -102,10 +102,44 @@ fn request(dev: bool, req: &Request) -> Result<Response, String> {
         }
         serde_json::from_str(&line).map_err(|e| e.to_string())
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
     {
-        let _ = (dev, req);
-        Err("Phase 1 IPC supports Unix-domain sockets only".into())
+        use std::{
+            fs::OpenOptions,
+            io::{BufRead, BufReader, Write},
+            thread,
+            time::Duration,
+        };
+        let address = paths(dev)?.socket;
+        let mut pipe = (0..20)
+            .find_map(|_| {
+                let attempt = OpenOptions::new().read(true).write(true).open(&address);
+                if let Ok(file) = attempt {
+                    return Some(file);
+                }
+                thread::sleep(Duration::from_millis(100));
+                None
+            })
+            .ok_or_else(|| {
+                format!(
+                    "cannot connect to watcherd named pipe: {}",
+                    address.display()
+                )
+            })?;
+        writeln!(
+            pipe,
+            "{}",
+            serde_json::to_string(req).map_err(|e| e.to_string())?
+        )
+        .map_err(|e| e.to_string())?;
+        let mut line = String::new();
+        BufReader::new(pipe)
+            .read_line(&mut line)
+            .map_err(|e| e.to_string())?;
+        if line.is_empty() {
+            return Err("daemon closed the named pipe".into());
+        }
+        serde_json::from_str(&line).map_err(|e| e.to_string())
     }
 }
 
