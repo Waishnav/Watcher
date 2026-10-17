@@ -1347,6 +1347,8 @@ name = "watcher-storage"
 version = "0.1.0"
 dependencies = [
  "rusqlite",
+ "tempfile",
+ "thiserror",
  "watcher-core",
 ]
 

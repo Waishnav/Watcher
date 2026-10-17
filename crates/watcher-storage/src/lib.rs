@@ -5,6 +5,9 @@ use rusqlite::{Connection, OptionalExtension, params};
 use std::path::Path;
 use watcher_core::{ActivityState, Interval};
 
+mod migrations;
+pub use migrations::{CURRENT_SCHEMA_VERSION, StorageInitError};
+
 pub struct Store {
     conn: Connection,
 }
@@ -34,28 +37,14 @@ impl Store {
         result
     }
 
-    pub fn open(path: &Path) -> rusqlite::Result<Self> {
-        let conn = Connection::open(path)?;
-        conn.pragma_update(None, "journal_mode", "WAL")?;
+    /// On daemon startup, upgrade an existing database in place. All required
+    /// upgrades are transactional and backed up using SQLite's online backup
+    /// API before the first schema change.
+    pub fn open(path: &Path) -> Result<Self, StorageInitError> {
+        let mut conn = Connection::open(path)?;
         conn.busy_timeout(std::time::Duration::from_secs(2))?;
-        let schema_version: i64 =
-            conn.pragma_query_value(None, "user_version", |row| row.get(0))?;
-        if schema_version > 1 {
-            return Err(rusqlite::Error::InvalidParameterName(format!(
-                "database schema {schema_version} is newer than supported version 1"
-            )));
-        }
-        conn.execute_batch(
-            "CREATE TABLE IF NOT EXISTS activity_intervals (
-                id INTEGER PRIMARY KEY,
-                start_ms INTEGER NOT NULL,
-                end_ms INTEGER NOT NULL CHECK(end_ms > start_ms),
-                app TEXT,
-                state TEXT NOT NULL CHECK(state IN ('active','idle','unknown','paused'))
-             );
-             CREATE INDEX IF NOT EXISTS intervals_by_time ON activity_intervals(start_ms,end_ms);
-             PRAGMA user_version = 1;",
-        )?;
+        migrations::ensure_current(&mut conn, path)?;
+        conn.pragma_update(None, "journal_mode", "WAL")?;
         Ok(Self { conn })
     }
 

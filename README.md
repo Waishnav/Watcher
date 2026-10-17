@@ -36,6 +36,12 @@ Run `watcher --help` for the full command syntax, including `--json` and `today 
 
 The dev profile uses `.watcher-dev/` for its database, IPC socket, and daemon lock. You can set `WATCHER_DEV_HOME` to an absolute directory to isolate separate QA sessions. The production profile uses the normal XDG data and runtime directories.
 
+### On-device database upgrades
+
+Watcher currently stores activity in **SQLite schema v2**. When an updated daemon starts, it checks the on-device schema and automatically runs any missing ordered migrations before opening IPC or tracking activity. Existing v1 databases receive a **consistent local SQLite backup** beside `watcher.sqlite` first; v2 adds only a time-range query index and keeps historical usage unchanged. Bad, unversioned nonempty, or newer-than-supported databases fail safely rather than being overwritten or silently downgraded. Backups remain private, local, and are not automatically removed.
+
+See [database migrations and recovery](docs/plans/storage-migrations.md).
+
 ## Install for your user
 
 ```sh

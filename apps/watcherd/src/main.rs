@@ -78,6 +78,9 @@ mod linux {
         private_dir(&data)?;
         private_dir(socket.parent().ok_or("invalid socket path")?)?;
         let _lock = try_lock(&data.join("daemon.lock"))?;
+        // Upgrade and validate before advertising IPC or starting collectors.
+        // Failed migrations leave no newly bound socket behind.
+        let service = Arc::new(Mutex::new(Service::open(platform, &data)?));
         let listener = if socket.exists() {
             // Our exclusive lock proves that no instance using this profile is
             // alive; only then is it safe to replace a stale socket.
@@ -89,7 +92,6 @@ mod linux {
         fs::set_permissions(&socket, fs::Permissions::from_mode(0o600))
             .map_err(|e| e.to_string())?;
         listener.set_nonblocking(true).map_err(|e| e.to_string())?;
-        let service = Arc::new(Mutex::new(Service::open(platform, &data)?));
         let stop = Arc::new(AtomicBool::new(false));
         ctrlc::set_handler({
             let stop = Arc::clone(&stop);
