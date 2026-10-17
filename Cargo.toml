@@ -1,0 +1,16 @@
+[workspace]
+resolver = "3"
+members = [
+  "apps/watcher",
+  "apps/watcherd",
+  "crates/watcher-core",
+  "crates/watcher-ipc",
+  "crates/watcher-platform",
+  "crates/watcher-storage",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"

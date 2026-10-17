@@ -1,0 +1,6 @@
+{
+  "uuid": "watcher-focus@watcher",
+  "name": "Watcher Focus Bridge",
+  "description": "Opt-in foreground app-ID events for the local Watcher daemon; no titles or input captured.",
+  "shell-version": ["45", "46", "47", "48", "49", "50"]
+}

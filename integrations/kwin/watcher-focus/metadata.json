@@ -1,0 +1,12 @@
+{
+  "KPackageStructure": "KWin/Script",
+  "KPlugin": {
+    "Id": "watcher-focus",
+    "Name": "Watcher Focus Bridge",
+    "Description": "Opt-in KWin foreground application identity for Watcher",
+    "Version": "0.1.0",
+    "License": "MIT"
+  },
+  "X-Plasma-API": "javascript",
+  "X-Plasma-MainScript": "code/main.js"
+}
