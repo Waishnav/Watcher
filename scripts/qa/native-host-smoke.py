@@ -28,19 +28,27 @@ def send(message, env):
 
 with tempfile.TemporaryDirectory(prefix='watcher-p3-') as home:
     env = dict(os.environ, WATCHER_DEV_HOME=home)
+    if env.get('WATCHER_XVFB_QA') == '1':
+        assert env.get('DISPLAY'), 'Xvfb QA requires a private DISPLAY'
+        # The hosted runner has no login session type. Force X11 only in the
+        # explicitly opt-in, disposable Xvfb environment.
+        env['XDG_SESSION_TYPE'] = 'x11'
+        env.pop('HYPRLAND_INSTANCE_SIGNATURE', None)
+        env.pop('SWAYSOCK', None)
     now = int(time.time() * 1000)
     sample = dict(source_id='qa-profile-1', seq=1, start_ms=now - 5000,
                   end_ms=now - 1000, domain='example.org')
     request = dict(op='browser_batch', version=1, intervals=[sample])
     assert send(request, env)['message'] == 'daemon_unavailable'
-    with open(os.devnull, 'w') as sink:
+    log_path = pathlib.Path(home) / 'daemon.log'
+    with log_path.open('w') as sink:
         daemon = subprocess.Popen([str(DAEMON), '--dev'], env=env, stdout=sink, stderr=sink)
         try:
             socket = pathlib.Path(home) / 'daemon.sock'
             for _ in range(80):
                 if socket.exists():
                     break
-                assert daemon.poll() is None, 'daemon failed to start'
+                assert daemon.poll() is None, f'daemon failed to start: {log_path.read_text()}'
                 time.sleep(.1)
             assert socket.exists(), 'daemon socket did not appear'
             for _ in range(2):
