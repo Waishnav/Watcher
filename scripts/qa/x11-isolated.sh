@@ -14,11 +14,22 @@ export XDG_SESSION_TYPE=x11
 unset HYPRLAND_INSTANCE_SIGNATURE SWAYSOCK WAYLAND_DISPLAY
 export WATCHER_DEV_HOME="$(mktemp -d)"
 cleanup() {
+  rc=$?
+  if (( rc != 0 )); then
+    echo 'Isolated X11 QA failed; collector and window-manager logs follow:' >&2
+    for log in daemon.log openbox.log a.log b.log; do
+      if [[ -f "$WATCHER_DEV_HOME/$log" ]]; then
+        echo "--- $log ---" >&2
+        tail -80 "$WATCHER_DEV_HOME/$log" >&2
+      fi
+    done
+  fi
   if [[ -n "${daemon_pid:-}" ]]; then kill "$daemon_pid" 2>/dev/null || true; wait "$daemon_pid" 2>/dev/null || true; fi
   if [[ -n "${a_pid:-}" ]]; then kill "$a_pid" 2>/dev/null || true; wait "$a_pid" 2>/dev/null || true; fi
   if [[ -n "${b_pid:-}" ]]; then kill "$b_pid" 2>/dev/null || true; wait "$b_pid" 2>/dev/null || true; fi
   if [[ -n "${wm_pid:-}" ]]; then kill "$wm_pid" 2>/dev/null || true; wait "$wm_pid" 2>/dev/null || true; fi
   rm -rf -- "$WATCHER_DEV_HOME"
+  exit "$rc"
 }
 trap cleanup EXIT
 openbox --sm-disable >"$WATCHER_DEV_HOME/openbox.log" 2>&1 & wm_pid=$!

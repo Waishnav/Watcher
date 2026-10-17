@@ -1,0 +1,23 @@
+# Experimental compositor QA: deliberately manual until this headless recipe
+# has passed on an Ubuntu runner. It never uses a maintainer's desktop session.
+name: Experimental headless Sway QA
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sway-focus:
+    # Before this has passed on a runner, enable on an unmerged PR by
+    # explicitly adding the 'qa-sway' label. Regular PRs skip this job.
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'qa-sway')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: sudo apt-get update && sudo apt-get install -y sway foot jq
+      - run: cargo build --workspace --locked
+      - run: WATCHER_HEADLESS_QA=1 bash scripts/qa/sway-headless.sh
