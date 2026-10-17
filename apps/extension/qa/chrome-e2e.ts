@@ -142,10 +142,18 @@ try {
   const gamma = `http://gamma.test:${serverPort}/`;
   await activate(alpha);
   await activate(beta);
+  await activate(alpha); // close beta's interval before checking both domains
+  const focusedTabs = await panel!.evaluate(
+    () => (globalThis as any).chrome.tabs.query({ active: true, lastFocusedWindow: true }),
+  );
+  assert(focusedTabs.some((tab: any) => tab.url?.startsWith(alpha)),
+    'INCONCLUSIVE: Chrome did not independently observe tab A → B → A');
   let observed = await eventually(
     () => request({ type: 'watcher-dashboard' }),
-    (value) => value.local.pending > 0 && value.local.domains.some((d: any) => d.domain === 'alpha.test'),
-    'offline alpha observations',
+    (value) => value.local.pending > 0
+      && ['alpha.test', 'beta.test'].every((domain) =>
+        value.local.domains.some((d: any) => d.domain === domain && d.duration_ms > 0)),
+    'offline alpha and beta observations',
   );
   assert.equal(observed.online, false);
   assert(observed.local.domains.every((d: any) => ['alpha.test', 'beta.test'].includes(d.domain)),
@@ -155,15 +163,13 @@ try {
   // Chromium's own window states are the ground truth, not time-based guesses.
   const newWindow = await panel!.evaluate((url) => (globalThis as any).chrome.windows.create({ url, focused: false }), gamma);
   const windows = await panel!.evaluate(() => (globalThis as any).chrome.windows.getAll());
-  if (!newWindow.focused && windows.some((w: any) => w.focused && w.id !== newWindow.id)) {
-    await sleep(900);
-    observed = await request({ type: 'watcher-dashboard' });
-    assert(!observed.local.domains.some((d: any) => d.domain === 'gamma.test'),
-      'background/unfocused window was credited website usage');
-    console.log('PASS: independently unfocused browser window received no domain time');
-  } else {
-    console.log('INCONCLUSIVE: headless Chromium did not create an independently unfocused window');
-  }
+  assert(!newWindow.focused && windows.some((w: any) => w.focused && w.id !== newWindow.id),
+    'INCONCLUSIVE: Chrome did not independently confirm the background-window focus scenario');
+  await sleep(900);
+  observed = await request({ type: 'watcher-dashboard' });
+  assert(!observed.local.domains.some((d: any) => d.domain === 'gamma.test'),
+    'background/unfocused window was credited website usage');
+  console.log('PASS: independently unfocused browser window received no domain time');
 
   const pendingBeforeRestart = observed.local.pending;
   await context!.close();
