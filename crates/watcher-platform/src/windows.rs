@@ -16,12 +16,12 @@ use windows_sys::Win32::{
         Threading::{OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION, QueryFullProcessImageNameW},
     },
     UI::{
-        Accessibility::{
-            EVENT_SYSTEM_FOREGROUND, HWINEVENTHOOK, SetWinEventHook, UnhookWinEvent,
-            WINEVENT_OUTOFCONTEXT,
-        },
+        Accessibility::{HWINEVENTHOOK, SetWinEventHook, UnhookWinEvent},
         Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO},
-        WindowsAndMessaging::{GetForegroundWindow, GetMessageW, GetWindowThreadProcessId, MSG},
+        WindowsAndMessaging::{
+            EVENT_SYSTEM_FOREGROUND, GetForegroundWindow, GetMessageW, GetWindowThreadProcessId,
+            MSG, WINEVENT_OUTOFCONTEXT,
+        },
     },
 };
 
