@@ -20,3 +20,5 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y xvfb openbox xterm xdotool sqlite3
       - run: cargo build --workspace --locked
       - run: WATCHER_XVFB_QA=1 xvfb-run -a -s '-screen 0 1280x720x24' bash scripts/qa/x11-isolated.sh
+      - name: Native Messaging offline and replay integration
+        run: WATCHER_XVFB_QA=1 xvfb-run -a -s '-screen 0 1280x720x24' python3 scripts/qa/native-host-smoke.py

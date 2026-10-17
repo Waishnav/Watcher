@@ -1328,6 +1328,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "watcher-native-host"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "watcher-ipc",
+]
+
+[[package]]
 name = "watcher-platform"
 version = "0.1.0"
 dependencies = [
@@ -1350,6 +1358,7 @@ dependencies = [
  "tempfile",
  "thiserror",
  "watcher-core",
+ "watcher-ipc",
 ]
 
 [[package]]

@@ -12,7 +12,7 @@ use std::{
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
-pub const CURRENT_SCHEMA_VERSION: i64 = 2;
+pub const CURRENT_SCHEMA_VERSION: i64 = 3;
 
 #[derive(Debug, thiserror::Error)]
 pub enum StorageInitError {
@@ -54,6 +54,10 @@ const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 2,
         sql: include_str!("../migrations/002_end_time_index.sql"),
+    },
+    Migration {
+        version: 3,
+        sql: include_str!("../migrations/003_browser_intervals.sql"),
     },
 ];
 
@@ -152,6 +156,65 @@ fn verify_structure(conn: &Connection, version: i64) -> Result<(), StorageInitEr
     verify_index(conn, "intervals_by_time", &["start_ms", "end_ms"])?;
     if version >= 2 {
         verify_index(conn, "intervals_by_end", &["end_ms"])?;
+    }
+    if version >= 3 {
+        let names: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='browser_intervals'",
+            [],
+            |row| row.get(0),
+        )?;
+        if names != 1 {
+            return Err(StorageInitError::InvalidSchema(
+                "browser_intervals missing".into(),
+            ));
+        }
+        verify_index(conn, "browser_by_time", &["start_ms", "end_ms"])?;
+        let mut columns = conn.prepare("PRAGMA table_info('browser_intervals')")?;
+        let actual = columns
+            .query_map([], |row| {
+                Ok((
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, i64>(3)?,
+                    row.get::<_, i64>(5)?,
+                ))
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        let expected = [
+            ("source_id", "TEXT", 1, 1),
+            ("seq", "INTEGER", 1, 2),
+            ("start_ms", "INTEGER", 1, 0),
+            ("end_ms", "INTEGER", 1, 0),
+            ("domain", "TEXT", 1, 0),
+        ];
+        if actual.len() != expected.len()
+            || actual
+                .iter()
+                .zip(expected)
+                .any(|(a, e)| (a.0.as_str(), a.1.as_str(), a.2, a.3) != e)
+        {
+            return Err(StorageInitError::InvalidSchema(
+                "browser_intervals columns differ from v3".into(),
+            ));
+        }
+        let sql: String = conn.query_row(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='browser_intervals'",
+            [],
+            |row| row.get(0),
+        )?;
+        let compact: String = sql
+            .chars()
+            .filter(|c| !c.is_whitespace())
+            .collect::<String>()
+            .to_ascii_lowercase();
+        if !compact.contains("check(seq>0)")
+            || !compact.contains("check(end_ms>start_ms)")
+            || !compact.contains("withoutrowid")
+        {
+            return Err(StorageInitError::InvalidSchema(
+                "browser_intervals constraints differ from v3".into(),
+            ));
+        }
     }
     Ok(())
 }

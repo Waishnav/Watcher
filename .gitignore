@@ -25,3 +25,6 @@
 .DS_Store
 .idea/
 .vscode/
+# WXT extension cache and browser build artifacts
+**/.wxt/
+**/.output/

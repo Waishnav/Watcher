@@ -100,3 +100,49 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run build
+
+  browser-extension:
+    name: WXT Chrome + Firefox / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+    defaults:
+      run:
+        working-directory: apps/extension
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - run: bun install --frozen-lockfile
+      - run: bunx wxt prepare
+      - run: bun run check
+      - run: bun run test
+      - run: bun run build
+      - run: bun run build:firefox
+
+  browser-runtime:
+    name: Isolated Chrome extension runtime and offline replay
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - name: Build native daemon and browser bridge
+        run: cargo build --workspace --locked
+      - name: Install browser QA dependencies
+        working-directory: apps/extension
+        run: bun install --frozen-lockfile
+      - name: Install Playwright Chromium for unpacked-extension QA
+        working-directory: apps/extension
+        run: bunx playwright-core install chromium --no-shell
+      - name: Verify isolated extension behavior and Native Messaging replay
+        working-directory: apps/extension
+        run: bun run qa:chrome

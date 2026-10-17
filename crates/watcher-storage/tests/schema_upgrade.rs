@@ -13,7 +13,7 @@ fn backups(dir: &Path) -> Vec<PathBuf> {
         .map(|d| d.unwrap().path())
         .filter(|path| {
             path.file_name().and_then(|n| n.to_str()).is_some_and(|n| {
-                n.starts_with("watcher.sqlite.pre-v1-to-v2-") && n.ends_with(".bak")
+                n.starts_with("watcher.sqlite.pre-v1-to-v3-") && n.ends_with(".bak")
             })
         })
         .collect();
@@ -106,7 +106,7 @@ fn upgrades_an_actual_v1_fixture_preserving_uncheckpointed_wal_rows() {
         "ok"
     );
     let after = Connection::open(&path).unwrap();
-    assert_eq!(version(&after), 2);
+    assert_eq!(version(&after), 3);
     assert_eq!(
         after
             .query_row("SELECT count(*) FROM activity_intervals", [], |r| r
@@ -162,7 +162,7 @@ fn refuses_newer_versions_without_downgrading() {
         Store::open(&path),
         Err(StorageInitError::NewerSchema {
             found: 99,
-            supported: 2
+            supported: 3
         })
     ));
     let conn = Connection::open(&path).unwrap();
@@ -208,4 +208,69 @@ fn backup_is_private_to_the_local_user() {
     assert_eq!(mode, 0o600);
     let db_mode = fs::metadata(path).unwrap().permissions().mode() & 0o777;
     assert_eq!(db_mode, 0o600);
+}
+
+#[test]
+fn browser_replay_is_idempotent_and_never_inflates_desktop_time() {
+    use watcher_ipc::BrowserInterval;
+    let temp = TempDir::new().unwrap();
+    let path = temp.path().join("watcher.sqlite");
+    let mut store = Store::open(&path).unwrap();
+    let batch = vec![BrowserInterval {
+        source_id: "browser-a".into(),
+        seq: 1,
+        start_ms: 1_000,
+        end_ms: 10_000,
+        domain: "example.org".into(),
+    }];
+    store.import_browser(&batch, 15_000).unwrap();
+    store.import_browser(&batch, 15_000).unwrap();
+    assert_eq!(
+        store.browser_report(0, 20_000).unwrap()[0].duration_ms,
+        9_000
+    );
+    // Browser records are never inserted into OS activity_intervals.
+    assert!(store.query(0, 20_000, 100).unwrap().is_empty());
+    let invalid = vec![BrowserInterval {
+        seq: 2,
+        domain: "example.org/path?private=1".into(),
+        ..batch[0].clone()
+    }];
+    assert!(store.import_browser(&invalid, 15_000).is_err());
+    assert_eq!(store.browser_report(0, 20_000).unwrap().len(), 1);
+    let conflict = vec![BrowserInterval {
+        domain: "elsewhere.example".into(),
+        ..batch[0].clone()
+    }];
+    assert!(store.import_browser(&conflict, 15_000).is_err());
+    let overlap = vec![BrowserInterval {
+        seq: 2,
+        start_ms: 5_000,
+        end_ms: 11_000,
+        ..batch[0].clone()
+    }];
+    assert!(store.import_browser(&overlap, 15_000).is_err());
+}
+
+#[test]
+fn upgrades_version_two_to_three_without_losing_device_intervals() {
+    let temp = TempDir::new().unwrap();
+    let path = temp.path().join("watcher.sqlite");
+    let conn = Connection::open(&path).unwrap();
+    conn.execute_batch(include_str!("fixtures/v1.sql")).unwrap();
+    conn.execute_batch(include_str!("../migrations/002_end_time_index.sql"))
+        .unwrap();
+    conn.pragma_update(None, "user_version", 2).unwrap();
+    drop(conn);
+    let db = Store::open(&path).unwrap();
+    assert_eq!(db.query(0, 10_000, 100).unwrap().len(), 5);
+    drop(db);
+    let conn = Connection::open(&path).unwrap();
+    assert_eq!(version(&conn), 3);
+    let copies = fs::read_dir(temp.path())
+        .unwrap()
+        .filter_map(Result::ok)
+        .filter(|e| e.file_name().to_string_lossy().contains("pre-v2-to-v3"))
+        .count();
+    assert_eq!(copies, 1);
 }
