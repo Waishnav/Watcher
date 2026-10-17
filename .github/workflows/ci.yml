@@ -127,7 +127,7 @@ jobs:
   browser-runtime:
     name: Isolated Chrome extension runtime and offline replay
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -135,13 +135,14 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.14"
-      - name: Confirm Chrome is installed on the hosted runner
-        run: google-chrome --version
       - name: Build native daemon and browser bridge
         run: cargo build --workspace --locked
       - name: Install browser QA dependencies
         working-directory: apps/extension
         run: bun install --frozen-lockfile
+      - name: Install Playwright Chromium for unpacked-extension QA
+        working-directory: apps/extension
+        run: bunx playwright-core install chromium --no-shell
       - name: Verify isolated extension behavior and Native Messaging replay
         working-directory: apps/extension
         run: bun run qa:chrome

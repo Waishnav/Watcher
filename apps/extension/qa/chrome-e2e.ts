@@ -21,9 +21,11 @@ const cli = resolve(repo, 'target/debug/watcher');
 for (const path of [join(dist, 'manifest.json'), host, daemon, cli]) {
   assert(existsSync(path), `build required before QA: ${path}`);
 }
-const chromeExecutable = [process.env.CHROME_BIN, '/usr/bin/chromium', '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable']
+// Branded Google Chrome builds can reject sideload flags; prefer Playwright's
+// open-source Chromium for genuine extension background-worker tests.
+const chromeExecutable = [process.env.CHROME_BIN, chromium.executablePath(), '/usr/bin/chromium']
   .find((item) => item && existsSync(item));
-assert(chromeExecutable, 'Chromium/Chrome executable required for real browser QA');
+assert(chromeExecutable, 'Unbranded Chromium required; run: bunx playwright-core install chromium');
 
 const qa = mkdtempSync(join(tmpdir(), 'watcher-browser-qa-'));
 const profile = join(qa, 'chrome-profile');
