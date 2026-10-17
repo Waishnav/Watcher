@@ -23,9 +23,10 @@ for (const path of [join(dist, 'manifest.json'), host, daemon, cli]) {
 }
 // Branded Google Chrome builds can reject sideload flags; prefer Playwright's
 // open-source Chromium for genuine extension background-worker tests.
-const chromeExecutable = [process.env.CHROME_BIN, chromium.executablePath(), '/usr/bin/chromium']
+const chromeExecutable = [chromium.executablePath(), '/usr/bin/chromium', process.env.CHROME_BIN]
   .find((item) => item && existsSync(item));
 assert(chromeExecutable, 'Unbranded Chromium required; run: bunx playwright-core install chromium');
+console.log(`QA Chromium: ${chromeExecutable}`);
 
 const qa = mkdtempSync(join(tmpdir(), 'watcher-browser-qa-'));
 const profile = join(qa, 'chrome-profile');
@@ -78,9 +79,22 @@ function launchOptions() {
 
 async function openPanel() {
   context = await chromium.launchPersistentContext(profile, launchOptions());
-  const worker = context.serviceWorkers()[0] ?? await context.waitForEvent('serviceworker', { timeout: 10_000 });
-  const id = new URL(worker.url()).host;
-  assert(id, 'Chromium did not load the extension background service worker');
+  // A background service worker is allowed to be asleep on initial launch.
+  // Discover the installed extension independently through Chromium's own
+  // extensions page; loading the panel should then wake the worker on demand.
+  const extensionsPage = await context.newPage();
+  await extensionsPage.goto('chrome://extensions/', { waitUntil: 'domcontentloaded' });
+  const watcher = extensionsPage.locator('extensions-item')
+    .filter({ hasText: 'Watcher — Browser & Device Time' }).first();
+  try {
+    await watcher.waitFor({ timeout: 10_000 });
+  } catch {
+    const text = (await extensionsPage.locator('body').innerText().catch(() => '')).slice(0, 1200);
+    throw new Error(`Chromium did not load Watcher as an unpacked extension: ${text}`);
+  }
+  const id = await watcher.getAttribute('id');
+  await extensionsPage.close();
+  assert(id, 'Chromium loaded Watcher without a usable extension ID');
   if (extensionId) assert.equal(id, extensionId, 'extension identity must persist across restart');
   extensionId = id;
   panel = await context.newPage();
