@@ -10,6 +10,8 @@ Cross-platform checks belong on the **`feat/cross-platform-ci`** branch, stacked
 | `ci.yml` / Rust 1.85 | PR, push to main, manual | Manifest's declared minimum supported Rust version builds under 1.85 | Native Windows/macOS toolchains |
 | `ci.yml` / Rust native matrix | PR, push to main, manual | **Native** build of every workspace target, all Rust tests, CLI `--help` startup; matrix: Ubuntu 24.04, Windows 2025, macOS 15 | Desktop focus, input idling, screen lock, suspend, IPC access controls in a real session |
 | `ci.yml` / OpenTUI matrix | PR, push to main, manual | Bun frozen dependency install, TypeScript typecheck and bundling on the same three OS runners | Human terminal interaction and native UI lifecycle |
+| `ci.yml` / WXT extension matrix | PR, push to main, manual | Chrome and Firefox bundles, TypeScript, IndexedDB/domain tests on Ubuntu, Windows, macOS | Real Firefox sidebar/native-host runtime behavior |
+| `ci.yml` / isolated Chrome browser runtime | PR, push to main, manual | A real headless Chrome extension with a temporary profile, offline tab A→B, nonfocused window, full browser restart, Native Messaging host, SQLite replay with inert collector | Firefox runtime, desktop-idle/lock or user-display behavior |
 | `desktop-qa.yml` / X11 | PR, manual, weekly | A disposable Xvfb display with Openbox, app A→B focus, collector totals, SQLite integrity and no overlapping intervals | Real X11 hardware, lock/suspend |
 | `sway-qa.yml` / experimental Sway | Manual dispatch once on main, or opt-in PR label `qa-sway` | Own headless wlroots compositor, private runtime/socket, separate foot windows, independent compositor vs Watcher focus A→B | Active input-idle tracking (headless environments may not expose v2), lock/suspend, GNOME/KDE |
 

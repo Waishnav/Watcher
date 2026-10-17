@@ -8,7 +8,8 @@
     "check": "tsc --noEmit",
     "build": "wxt build -b chrome",
     "build:firefox": "wxt build -b firefox",
-    "test": "bun test"
+    "test": "bun test",
+    "qa:chrome": "bun run build && bun run qa/chrome-e2e.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.5.0",
@@ -29,6 +30,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "fake-indexeddb": "^6.2.6",
+    "playwright-core": "^1.64.1",
     "tailwindcss": "^4.3.3",
     "typescript": "5.9.3"
   }

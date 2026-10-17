@@ -79,7 +79,9 @@ export default defineBackground(() => {
   });
   browser.runtime.onMessage.addListener(async (message: { type?: string }) => {
     if (message?.type !== 'watcher-dashboard') return undefined;
-    await serial;
+    // A user opening or refreshing the sidepanel should be able to reconnect
+    // immediately instead of waiting for the next one-minute alarm.
+    await sync();
     const now = Date.now();
     const beginning = new Date(now);
     beginning.setHours(0, 0, 0, 0);

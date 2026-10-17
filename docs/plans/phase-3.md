@@ -35,6 +35,12 @@ For native-host testing without touching the installed companion, build `watcher
 
 Firefox has explicitly declared `websiteActivity` data-collection metadata because domain observations can leave the extension for local daemon storage. **No information is transmitted to an external service.** Explicit opt-in to private-window access should remain off; if enabled manually, a collector-level private-window exclusion is still required before distribution.
 
+## Real Chrome QA results
+
+An isolated headless Chromium profile driven by **agent-browser**, and an automated Playwright-core regression script, have verified tab A → B transitions, no accumulation for an independently unfocused window, durable offline storage through complete browser restart, and Native Messaging import after daemon reconnection. The Chrome native bridge syncs without a web server. The test deliberately uses an inert disposable OS collector and does **not** claim device-verified domain time. See [real browser QA](../qa/phase-3-browser.md).
+
+The Chrome automated acceptance script runs as a dedicated `browser-runtime` GitHub Actions job on Ubuntu; the existing native Rust and Chrome/Firefox bundle matrix remains separate.
+
 ## Work remaining before Phase 3 acceptance
 
 - Runtime QA with Chrome and Firefox: sidepanel open, tab A→B, browser focus loss, browser idle/lock, restart of MV3 worker, private windows, multiple windows/profiles, daemon offline/online replay, and native-host registration/uninstallation.
