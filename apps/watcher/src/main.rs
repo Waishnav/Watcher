@@ -222,6 +222,12 @@ fn output(response: Response, json: bool) -> Result<(), String> {
             }
         }
         Response::Report { report, .. } => report_output(&report, color),
+        Response::BrowserAck { received, .. } => println!("Stored {received} browser observations"),
+        Response::BrowserReport { domains, .. } => {
+            for row in domains {
+                println!("{}  {}", row.domain, pretty(row.duration_ms));
+            }
+        }
         Response::Timeline { intervals, .. } => timeline_output(&intervals, color),
         Response::Ok { message, .. } => println!("{}", colored(&message, "32", color)),
         Response::Error { message, .. } => return Err(message),

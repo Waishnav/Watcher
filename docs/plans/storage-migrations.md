@@ -1,6 +1,6 @@
 # Watcher: local SQLite migration contract
 
-**Implemented in the Rust rewrite:** automatic migration of historical schema v1 to schema **v2**, plus creation of v2 databases from scratch. The migration code is embedded in the daemon; no standalone migration executable, cloud service, or installer script is needed.
+**Implemented in the Rust rewrite:** automatic schema migrations from historical v1/v2 to current **v3**, including creation of v3 databases from scratch. The migration code is embedded in the daemon; no standalone migration executable, cloud service, or installer script is needed.
 
 ## Authoritative code
 
@@ -10,7 +10,7 @@
 - `crates/watcher-storage/tests/fixtures/v1.sql` — historical v1 fixture independent of the latest schema creation code.
 - `crates/watcher-storage/tests/schema_upgrade.rs` — on-disk upgrade and failure-mode tests.
 
-## Current v2 schema
+## Original v2 device-activity schema (retained under v3)
 
 ```sql
 CREATE TABLE activity_intervals (
@@ -22,10 +22,11 @@ CREATE TABLE activity_intervals (
 );
 CREATE INDEX intervals_by_time ON activity_intervals(start_ms, end_ms);
 CREATE INDEX intervals_by_end ON activity_intervals(end_ms);
-PRAGMA user_version = 2;
+-- v3 adds browser_intervals; see 003_browser_intervals.sql
+PRAGMA user_version = 3;
 ```
 
-Source-of-truth activity intervals are unchanged. All times are UTC Unix milliseconds. There are no daily aggregates and no cloud-dependent schema version.
+Source-of-truth device activity intervals are unchanged. v3 adds a separate browser_observed interval table with `(source_id, seq)` idempotence; it never adds browser durations to OS active totals. All times are UTC Unix milliseconds. There are no daily aggregates and no cloud-dependent schema version.
 
 ## Startup sequence
 
@@ -68,3 +69,7 @@ For manual recovery, first stop the daemon, preserve the database **and any `-wa
 - A real `watcherd --dev` startup using a disposable historical v1 file upgraded to v2, preserved five historical rows, and exposed working `watcher --dev status`; SQLite integrity check returned `ok`.
 
 No CI workflow changes or production activity database changes were made for this work.
+
+## Phase 3 migration
+
+The additional `003_browser_intervals.sql` migration runs in the same transaction and backup protocol as earlier migrations. Existing v1 and v2 databases first receive a consistent on-device backup, then all missing SQL migrations; current `PRAGMA user_version` is **3**. Browser-observed data is stored separately from the OS-verified `activity_intervals` source of truth. See [Phase 3](phase-3.md).

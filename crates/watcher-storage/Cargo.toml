@@ -9,6 +9,7 @@ publish = false
 [dependencies]
 rusqlite = { version = "0.37", features = ["bundled", "backup"] }
 watcher-core = { path = "../watcher-core" }
+watcher-ipc = { path = "../watcher-ipc" }
 thiserror = "2"
 
 [dev-dependencies]

@@ -3,6 +3,7 @@ resolver = "3"
 members = [
   "apps/watcher",
   "apps/watcherd",
+  "apps/native-host",
   "crates/watcher-core",
   "crates/watcher-ipc",
   "crates/watcher-platform",

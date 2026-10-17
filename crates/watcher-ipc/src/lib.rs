@@ -7,6 +7,22 @@ use watcher_core::{Interval, Report, Snapshot};
 
 pub const PROTOCOL_VERSION: u32 = 1;
 
+/// Browser-observed time is *not* verified device active time.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct BrowserInterval {
+    pub source_id: String,
+    pub seq: i64,
+    pub start_ms: i64,
+    pub end_ms: i64,
+    pub domain: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct DomainUsage {
+    pub domain: String,
+    pub duration_ms: i64,
+}
+
 #[derive(Debug)]
 pub struct Paths {
     pub data: PathBuf,
@@ -82,6 +98,15 @@ pub enum Request {
     Status {
         version: u32,
     },
+    BrowserBatch {
+        version: u32,
+        intervals: Vec<BrowserInterval>,
+    },
+    BrowserReport {
+        version: u32,
+        from_ms: i64,
+        to_ms: i64,
+    },
     Report {
         version: u32,
         from_ms: i64,
@@ -108,6 +133,8 @@ impl Request {
     pub fn version(&self) -> u32 {
         match self {
             Self::Status { version }
+            | Self::BrowserBatch { version, .. }
+            | Self::BrowserReport { version, .. }
             | Self::Report { version, .. }
             | Self::Timeline { version, .. }
             | Self::Pause { version }
@@ -120,6 +147,14 @@ impl Request {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum Response {
+    BrowserAck {
+        version: u32,
+        received: usize,
+    },
+    BrowserReport {
+        version: u32,
+        domains: Vec<DomainUsage>,
+    },
     Status {
         version: u32,
         snapshot: Snapshot,

@@ -1,0 +1,11 @@
+[package]
+name = "watcher-native-host"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+watcher-ipc = { path = "../../crates/watcher-ipc" }
+serde_json = "1"

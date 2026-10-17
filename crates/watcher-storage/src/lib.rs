@@ -4,6 +4,7 @@
 use rusqlite::{Connection, OptionalExtension, params};
 use std::path::Path;
 use watcher_core::{ActivityState, Interval};
+use watcher_ipc::{BrowserInterval, DomainUsage};
 
 mod migrations;
 pub use migrations::{CURRENT_SCHEMA_VERSION, StorageInitError};
@@ -46,6 +47,100 @@ impl Store {
         migrations::ensure_current(&mut conn, path)?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
         Ok(Self { conn })
+    }
+
+    /// Idempotent import of browser-observed intervals; this does not alter
+    /// operating-system activity or make browser durations device-verified.
+    pub fn import_browser(
+        &mut self,
+        intervals: &[BrowserInterval],
+        now_ms: i64,
+    ) -> Result<(), String> {
+        if intervals.len() > 128 {
+            return Err("browser batch exceeds 128 intervals".into());
+        }
+        for item in intervals {
+            if item.source_id.is_empty()
+                || item.source_id.len() > 80
+                || !item
+                    .source_id
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+                || item.seq <= 0
+                || item.start_ms < 0
+                || item.start_ms >= item.end_ms
+                || item.end_ms.saturating_sub(item.start_ms) > 120_000
+                || item.end_ms > now_ms.saturating_add(30_000)
+                || item.domain.is_empty()
+                || item.domain.len() > 253
+                || !item.domain.is_ascii()
+                || !item
+                    .domain
+                    .bytes()
+                    .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'.' || b == b'-')
+            {
+                return Err("invalid browser interval".into());
+            }
+        }
+        let tx = self.conn.transaction().map_err(|e| e.to_string())?;
+        {
+            let mut statement = tx.prepare("INSERT INTO browser_intervals(source_id, seq, start_ms, end_ms, domain) VALUES(?1,?2,?3,?4,?5) ON CONFLICT(source_id,seq) DO NOTHING")
+                .map_err(|e| e.to_string())?;
+            let mut existing = tx.prepare("SELECT start_ms,end_ms,domain FROM browser_intervals WHERE source_id=?1 AND seq=?2")
+                .map_err(|e| e.to_string())?;
+            for item in intervals {
+                let prior: Option<(i64, i64, String)> = existing
+                    .query_row(params![item.source_id, item.seq], |row| {
+                        Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+                    })
+                    .optional()
+                    .map_err(|e| e.to_string())?;
+                if let Some((start, end, domain)) = prior {
+                    if (start, end, domain.as_str())
+                        != (item.start_ms, item.end_ms, item.domain.as_str())
+                    {
+                        return Err("replayed browser sequence conflicts with stored data".into());
+                    }
+                    continue;
+                }
+                let overlapping: i64 = tx
+                    .query_row(
+                        "SELECT EXISTS(SELECT 1 FROM browser_intervals WHERE source_id=?1 AND start_ms<?2 AND end_ms>?3)",
+                        params![item.source_id, item.end_ms, item.start_ms],
+                        |row| row.get(0),
+                    )
+                    .map_err(|e| e.to_string())?;
+                if overlapping != 0 {
+                    return Err("overlapping browser observations from the same source".into());
+                }
+                statement
+                    .execute(params![
+                        item.source_id,
+                        item.seq,
+                        item.start_ms,
+                        item.end_ms,
+                        item.domain
+                    ])
+                    .map_err(|e| e.to_string())?;
+            }
+        }
+        tx.commit().map_err(|e| e.to_string())
+    }
+
+    pub fn browser_report(&self, from_ms: i64, to_ms: i64) -> rusqlite::Result<Vec<DomainUsage>> {
+        let mut statement = self.conn.prepare(
+            "SELECT domain, SUM(MIN(end_ms, ?2) - MAX(start_ms, ?1)) AS duration
+             FROM browser_intervals WHERE end_ms > ?1 AND start_ms < ?2
+             GROUP BY domain ORDER BY duration DESC LIMIT 50",
+        )?;
+        statement
+            .query_map(params![from_ms, to_ms], |row| {
+                Ok(DomainUsage {
+                    domain: row.get(0)?,
+                    duration_ms: row.get(1)?,
+                })
+            })?
+            .collect()
     }
 
     pub fn last_end(&self) -> rusqlite::Result<Option<i64>> {

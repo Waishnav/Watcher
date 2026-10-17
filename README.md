@@ -38,9 +38,13 @@ The dev profile uses `.watcher-dev/` for its database, IPC socket, and daemon lo
 
 ### On-device database upgrades
 
-Watcher currently stores activity in **SQLite schema v2**. When an updated daemon starts, it checks the on-device schema and automatically runs any missing ordered migrations before opening IPC or tracking activity. Existing v1 databases receive a **consistent local SQLite backup** beside `watcher.sqlite` first; v2 adds only a time-range query index and keeps historical usage unchanged. Bad, unversioned nonempty, or newer-than-supported databases fail safely rather than being overwritten or silently downgraded. Backups remain private, local, and are not automatically removed.
+Watcher currently stores activity in **SQLite schema v3**. When an updated daemon starts, it checks the on-device schema and automatically runs any missing ordered migrations before opening IPC or tracking activity. Existing v1/v2 databases receive a **consistent local SQLite backup** beside `watcher.sqlite` before upgrading; v3 adds separately recorded browser-observed intervals and leaves historical device intervals unchanged. Bad, unversioned nonempty, or newer-than-supported databases fail safely rather than being overwritten or silently downgraded. Backups remain private, local, and are not automatically removed.
 
 See [database migrations and recovery](docs/plans/storage-migrations.md).
+
+### Phase 3 browser extension (experimental)
+
+A new [WXT extension](apps/extension/) provides Chrome/Firefox sidepanel analytics with IndexedDB offline collection. An optional `watcher-native-host` forwards browser observations to the per-user daemon without an HTTP server. Domain observations are **browser-observed**, not additional verified device activity. Native host setup is an opt-in developer workflow only. See [Phase 3 architecture and QA gaps](docs/plans/phase-3.md).
 
 ## Install for your user
 

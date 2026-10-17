@@ -98,6 +98,27 @@ impl Service {
             return error(err);
         }
         match request {
+            Request::BrowserBatch { intervals, .. } => {
+                match self.storage.import_browser(&intervals, now_ms()) {
+                    Ok(()) => Response::BrowserAck {
+                        version: PROTOCOL_VERSION,
+                        received: intervals.len(),
+                    },
+                    Err(message) => error(message),
+                }
+            }
+            Request::BrowserReport { from_ms, to_ms, .. } => {
+                if from_ms >= to_ms || to_ms - from_ms > 32 * 86_400_000 {
+                    return error("invalid browser report range".into());
+                }
+                match self.storage.browser_report(from_ms, to_ms) {
+                    Ok(domains) => Response::BrowserReport {
+                        version: PROTOCOL_VERSION,
+                        domains,
+                    },
+                    Err(err) => error(err.to_string()),
+                }
+            }
             Request::Status { .. } => {
                 let snapshot = self.reducer.snapshot();
                 let detail = format!(
