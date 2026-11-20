@@ -1,13 +1,79 @@
 #!/bin/bash
-sudo rm -rf /usr/share/Watcher/
-sudo rm -rf /usr/local/bin/watcher
+# Remove the user-local micro-watcher install.
+# Recorded data is kept unless the user explicitly asks to delete it.
+set -euo pipefail
 
-echo "Do you want to delete your raw_data files?? y or n (default: n)"
-read yes_or_no
+PREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/micro-watcher"
+BIN_DIR="${XDG_BIN_HOME:-$HOME/.local/bin}"
+LAUNCHER="$BIN_DIR/micro-watcher"
+DATA_DIR="$HOME/.cache/Watcher"
+GNOME_UUID="micro-watcher@alberto-caballero.github.io"
+GNOME_EXT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/$GNOME_UUID"
 
-if [[ $yes_or_no = y ]]; then
-    rm -rf ~/.cache/Watcher/
-else
-    echo "Nice Decision either way you might use this app in future"
+if [ -f "$LAUNCHER" ]; then
+    rm -f -- "$LAUNCHER"
+    echo "[✔] Removed $LAUNCHER"
 fi
 
+if [ -d "$PREFIX" ]; then
+    rm -rf -- "$PREFIX"
+    echo "[✔] Removed $PREFIX"
+fi
+
+if [ -d "$GNOME_EXT_DIR" ]; then
+    if command -v gnome-extensions >/dev/null 2>&1 && \
+       gnome-extensions disable "$GNOME_UUID" >/dev/null 2>&1; then
+        :
+    elif command -v gsettings >/dev/null 2>&1; then
+        python3 - "$GNOME_UUID" <<'PY' || true
+import ast
+import subprocess
+import sys
+
+uuid = sys.argv[1]
+try:
+    output = subprocess.check_output(
+        ["gsettings", "get", "org.gnome.shell", "enabled-extensions"],
+        text=True,
+    )
+    extensions = ast.literal_eval(output)
+except Exception:
+    sys.exit(0)
+
+if uuid in extensions:
+    extensions.remove(uuid)
+    value = "[" + ", ".join(
+        "'" + item.replace("\\", "\\\\").replace("'", "\\'") + "'"
+        for item in extensions
+    ) + "]"
+    subprocess.check_call(
+        ["gsettings", "set", "org.gnome.shell", "enabled-extensions", value]
+    )
+PY
+    fi
+    rm -rf -- "$GNOME_EXT_DIR"
+    echo "[✔] Removed the GNOME focus extension"
+fi
+
+if [ -e /usr/local/bin/watcher ] || [ -d /usr/share/Watcher ]; then
+    echo "[!] A legacy system-wide install still exists. Remove it manually:"
+    echo "    sudo rm -f /usr/local/bin/watcher"
+    echo "    sudo rm -rf /usr/share/Watcher"
+fi
+
+if [ -t 0 ]; then
+    printf 'Delete recorded screen-time data in %s? [y/N] ' "$DATA_DIR"
+    read -r answer || answer="n"
+else
+    answer="n"
+fi
+
+case "${answer:-n}" in
+    y|Y|yes|YES)
+        rm -rf -- "$DATA_DIR"
+        echo "[✔] Deleted $DATA_DIR"
+        ;;
+    *)
+        echo "Kept screen-time data in $DATA_DIR"
+        ;;
+esac

@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+"""Command-line entry point for micro-watcher."""
+import os
+import sys
+
+# Support both a checkout (src/bin + src/micro_watcher) and the user-local
+# install layout (<prefix>/bin + <prefix>/micro_watcher).
+_HERE = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.dirname(_HERE))
+
+from datetime import date, timedelta
+
+from micro_watcher import commands as cmd
+from micro_watcher import watch_log as x
+from micro_watcher.analysis import previous_week, weekly_logs
+from micro_watcher.commands import Color
+from micro_watcher.validation import ValidationError, validate_date, validate_week
+
+
+def help_option():
+    print(Color.BLUE("micro-watcher") + " - Minimal open source screen-time tracker\n")
+    print(Color.YELLOW("USAGE:") + "\n\t micro-watcher [OPTION]\n")
+    print(Color.YELLOW("OPTIONS"))
+    print("\t-ds, --day-summary       Shows today's screen-time and app-usage")
+    print("\t-ds [date]               Shows that day's screen-time and app-usage\n\t\t\t\t\t (if date is not given then date=today's date)")
+    print("\t-ws, --week-summary      Shows screen-time of each day of that running week")
+    print("\t-ws [week]               Shows screen-time of each day of that week given by you")
+    print("\t-s, --start              It starts taking logs afterwards in the following directory ~/.cache/Watcher/daily_data/")
+    print(Color.YELLOW("\nEXAMPLE COMMANDS"))
+    print("\tmicro-watcher -ds 2022-01-31")
+    print("\tmicro-watcher -ws W01-2022")
+    print("\nFor more information see github repo: " + Color.BLUE("https://github.com/Waishnav/Watcher") + " and Don't forget to star the repo")
+
+
+def wrong_option():
+    print(Color.RED("Wrong") + " [OPTION] chosen. Have a look at the Options!!\n")
+    print(Color.YELLOW("OPTIONS"))
+    print("\t-ds or --day-summary [date]      Displays where you have spend your time of that day")
+    print("\t-ws or --week-summary [week]     Displays screen-time of each day of week")
+    print(Color.YELLOW("\nEXAMPLE COMMANDS"))
+    print("\tmicro-watcher -ds 2022-01-31")
+    print("\tmicro-watcher -ws W01-2022")
+    print("\nFor more information see github repo: " + Color.BLUE("https://github.com/Waishnav/Watcher") + " and Don't forget to star the repo")
+
+
+def invalid_value(error):
+    print(Color.RED("Invalid value:") + f" {error}", file=sys.stderr)
+    print("Run 'micro-watcher --help' for usage.", file=sys.stderr)
+    return 2
+
+
+def main(argv):
+    if len(argv) == 2:
+        option = argv[1]
+        if option in ("-ds", "--day-summary"):
+            cmd.daily_summary()
+        elif option in ("-ws", "--week-summary"):
+            weekly_logs()
+            cmd.week_summary()
+        elif option in ("-h", "--help"):
+            help_option()
+        elif option in ("--start", "-s"):
+            if not x.log_creation():
+                return 1
+        elif option in ("--version", "-v"):
+            print("micro-watcher 2.0.0")
+        else:
+            wrong_option()
+            return 2
+
+    elif len(argv) == 3:
+        option, value = argv[1], argv[2]
+        if option in ("-ds", "--day-summary"):
+            if value in ("--yestarday", "--yesterday", "-y"):
+                yesterday = (date.today() - timedelta(days=1)).isoformat()
+                cmd.daily_summary(yesterday)
+            else:
+                try:
+                    day = validate_date(value)
+                except ValidationError as error:
+                    return invalid_value(error)
+                cmd.daily_summary(day)
+        elif option in ("-ws", "--week-summary"):
+            if value in ("--previous_week", "--previous-week", "-pw"):
+                prev_week = previous_week()
+                weekly_logs(prev_week)
+                cmd.week_summary(prev_week)
+            else:
+                try:
+                    week = validate_week(value)
+                except ValidationError as error:
+                    return invalid_value(error)
+                weekly_logs(week)
+                cmd.week_summary(week)
+        else:
+            wrong_option()
+            return 2
+
+    else:
+        wrong_option()
+        return 2
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

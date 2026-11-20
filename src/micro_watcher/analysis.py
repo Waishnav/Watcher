@@ -1,11 +1,13 @@
 import os
 import csv
-from watch_log import get_date
+from micro_watcher.watch_log import get_date
 import datetime
-import time_operations as to
+import micro_watcher.time_operations as to
+from micro_watcher.validation import validate_date, validate_week
 
 # creating dictionary to store time spend on each applicaitons on that particular day
 def final_report(date):
+    date = validate_date(date)
     path = os.environ['HOME'] +"/.cache/Watcher/daily_data/"
     filename = path + date + ".csv"
 
@@ -59,16 +61,28 @@ def week_dates(theday=datetime.date.today()):
     return dates
 
 def weekday_from_date(date):
-    day = os.popen('''date -d "'''+ date + '''" +%a''').read()
-    return day[0:-1]
+    date = validate_date(date)
+    return datetime.date.fromisoformat(date).strftime("%a")
 
-def weekly_logs(week = str(os.popen('''date +"W%V-%Y"''').read()[0:-1])):
+def current_week():
+    year, week, _ = datetime.date.today().isocalendar()
+    return f"W{week:02d}-{year}"
+
+def previous_week():
+    day = datetime.date.today() - datetime.timedelta(days=7)
+    year, week, _ = day.isocalendar()
+    return f"W{week:02d}-{year}"
+
+def weekly_logs(week=None):
+    if week is None:
+        week = current_week()
+    week = validate_week(week)
     user = os.environ['HOME']
     filename = user+"/.cache/Watcher/Analysis/"+week+".csv"
     with open(filename, "w") as csvfile:
         csvwriter = csv.writer(csvfile, delimiter='\t')
 
-        if os.popen('''date +"W%V-%Y"''').read()[0:-1] == week:
+        if current_week() == week:
             dates = week_dates()
         else:
             dates = week_dates(get_sunday_of_week(week))

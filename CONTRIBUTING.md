@@ -1,11 +1,11 @@
 
 -----------------------
-How Watcher works exactly ?
+How micro-watcher works exactly ?
 =================
 
 First let's understand how it works.
 
-`./install` file install's all the py scripts and make Watcher to run on startup.
+`./install` copies the Python modules into `~/.local/share/micro-watcher` and creates the `~/.local/bin/micro-watcher` launcher. It does not edit shell startup files or require root.
 
 ### **v1.0**
 

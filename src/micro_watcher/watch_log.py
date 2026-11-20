@@ -1,19 +1,18 @@
 import os
 import csv
 import time
-import get_windows as x
-import afk as y
-from time_operations import time_difference, time_addition, convert
+from datetime import datetime
+import micro_watcher.get_windows as x
+import micro_watcher.afk as y
+from micro_watcher.time_operations import time_difference, time_addition, convert
 
 # get current time whenever the function is called
 def get_time():
-    t = os.popen('''date +"%T"''').read()
-    return t[0:-1]
+    return datetime.now().strftime("%H:%M:%S")
 
 # get date of today
 def get_date():
-    d = os.popen('''date +"%Y-%m-%d"''').read()
-    return d[0:-1]
+    return datetime.now().strftime("%Y-%m-%d")
 
 def update_csv(date, Data):
     filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+date+".csv"
@@ -43,6 +42,16 @@ def import_data(file):
 # TODO: AFK feature devlopement (it will be developed after completing alpha product (after whole project up end running)
 
 def log_creation():
+    data_root = os.environ['HOME'] + "/.cache/Watcher"
+    os.makedirs(data_root + "/daily_data", exist_ok=True)
+    os.makedirs(data_root + "/Analysis", exist_ok=True)
+
+    available, status = x.backend_status()
+    if not available:
+        print("micro-watcher: cannot start tracking: " + status)
+        return False
+    print("Tracking via " + status + " (press Ctrl+C to stop)")
+
     filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv"
     if not(os.path.isfile(filename)):
         creat_file = os.environ['HOME']+"/.cache/Watcher/daily_data/"+get_date()+".csv"
@@ -56,7 +65,6 @@ def log_creation():
         date = get_date()
         filename = os.environ['HOME']+"/.cache/Watcher/daily_data/"+date+".csv"
         afk = y.is_afk(afkTimeout)
-        print(data)
 
         if not(afk):
             active_window = x.active_window()
@@ -66,8 +74,9 @@ def log_creation():
 
             time.sleep(1)
             if y.is_afk(afkTimeout):
-                afk_time = int(round(int(os.popen("xprintidle").read()[:-1])/1000, 0))
-                usage = time_difference(convert(afk_time), usage)
+                idle = y.idle_seconds()
+                if idle is not None:
+                    usage = time_difference(convert(int(round(idle))), usage)
 
             usage = time_addition("00:00:01", usage)
             data.update({active_window : usage})
@@ -79,10 +88,12 @@ def log_creation():
                     pass
 
                 data.clear()
-        
+        else:
+            # Do not busy-loop while idle; the next iteration checks whether
+            # the user has returned or media is still playing.
+            time.sleep(1)
+
 
 if __name__ == "__main__":
     log_creation()
-    #afk_time = int(round(int(os.popen("xprintidle").read()[:-1])/1000, 0))
-    #print(afk_time)
 

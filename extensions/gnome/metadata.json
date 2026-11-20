@@ -1,0 +1,8 @@
+{
+    "uuid": "micro-watcher@alberto-caballero.github.io",
+    "name": "micro-watcher Focus",
+    "description": "Exposes the focused application to the local micro-watcher screen-time tracker. No data leaves this machine.",
+    "shell-version": ["45", "46", "47", "48", "49", "50", "51"],
+    "version": 1,
+    "url": "https://github.com/AlbertoCaballero/micro-watcher"
+}

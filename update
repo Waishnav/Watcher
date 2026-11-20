@@ -1,7 +1,8 @@
 #!/bin/bash
-sudo rm -rf /usr/share/Watcher/*
-sudo cp -r ./src/Watcher/* /usr/share/Watcher/
+# Update a user-local micro-watcher install from this checkout.
+# The old script deleted the system install directory and copied files with
+# sudo; this version only refreshes the user-local copy.
+set -euo pipefail
 
-sudo cp -r ./src/bin/watcher /usr/local/bin/
-sudo chmod +x /usr/local/bin/watcher
-echo "[✔] Updating Finished."
+SRC_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+exec "$SRC_DIR/install" "$@"
